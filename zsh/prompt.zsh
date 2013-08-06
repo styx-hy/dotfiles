@@ -65,10 +65,11 @@ rb_prompt() {
   else
     echo ""
   fi
+  echo "%{$fg_bold[yellow]%}%n%{$reset_color%}"
 }
 
-directory_name() {
-  echo "%{$fg_bold[cyan]%}%1/%\/%{$reset_color%}"
+directory_name(){
+  echo "%{$fg_bold[cyan]%}%(4~|...|)%3~%\/%{$reset_color%}"
 }
 
 export PROMPT=$'\n$(rb_prompt)in $(directory_name) $(git_dirty)$(need_push)\n› '
