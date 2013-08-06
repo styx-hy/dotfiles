@@ -53,14 +53,16 @@ rb_prompt(){
     version=$(rbenv version-name 2> /dev/null)
     if [[ "$version" == "" ]] then version="-" fi
 
-    echo "%{$fg_bold[yellow]%}$version%{$reset_color%}"
+#   echo "%{$fg_bold[yellow]%}$version%{$reset_color%}"
   else
     echo ""
   fi
+  echo "%{$fg_bold[yellow]%}%n%{$reset_color%}"
 }
 
 directory_name(){
-  echo "%{$fg_bold[cyan]%}%1/%\/%{$reset_color%}"
+# echo "%{$fg_bold[cyan]%}%1/%\/%{$reset_color%}"
+  echo "%{$fg_bold[cyan]%}%(4~|...|)%3~%\/%{$reset_color%}"
 }
 
 export PROMPT=$'\n$(rb_prompt) in $(directory_name) $(git_dirty)$(need_push)\n› '

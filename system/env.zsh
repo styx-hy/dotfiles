@@ -2,4 +2,6 @@
 if [[ "$EDITOR" == "" ]] ; then
   # Use sublime for my editor.
   export EDITOR='subl'
+  # STYX Use emacs for my editor
+  export EDITOR='emacsclient -n'
 fi
