@@ -1,0 +1,2 @@
+# `cd -' will also do the trick
+cd "$OLDPWD"
