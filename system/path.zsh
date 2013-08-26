@@ -1,6 +1,7 @@
-export PATH="./bin:$HOME/.rbenv/shims:/usr/local/bin:/usr/local/sbin:$HOME/.sfs:$ZSH/bin:$PATH"
-export PATH="$PATH:$HOME/zion/projects/ssearcher"
-export PATH="$PATH:$HOME/zion/racket/racket/bin"
+# export PATH="./bin:$HOME/.rbenv/shims:/usr/local/bin:/usr/local/sbin:$HOME/.sfs:$ZSH/bin:$PATH"
+pushpath "./bin:$HOME/.rbenv/shims:/usr/local/bin:/usr/local/sbin:$HOME/.sfs:$ZSH/bin"
+appendpath "$HOME/zion/projects/ssearcher"
+appendpath "$HOME/zion/racket/racket/bin"
 
 export MANPATH="/usr/local/man:/usr/local/mysql/man:/usr/local/git/man:$MANPATH"
 

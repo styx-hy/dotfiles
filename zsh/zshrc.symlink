@@ -11,6 +11,14 @@ then
   source ~/.localrc
 fi
 
+# load auxiliary functions
+typeset -U prefunc_files
+prefunc_files=($ZSH/prefunc/*)
+for file in ${prefunc_files}
+do
+  source $file
+done
+
 # all of our zsh files
 typeset -U config_files
 config_files=($ZSH/**/*.zsh)
