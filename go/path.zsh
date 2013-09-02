@@ -8,4 +8,5 @@ appendpath "$HOME/zion/go/bin"
 #     export GOPATH=$HOME/zion/letsgo
 #     export PATH=$PATH:$GOPATH/bin
 # fi
-appendpath "$HOME/zion/letsgo/bin"
+export GOPATH="$HOME/zion/letsgo"
+appendpath "$GOPATH/bin"
