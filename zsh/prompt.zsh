@@ -49,7 +49,6 @@ need_push () {
 ruby_version() {
   if (( $+commands[rbenv] ))
   then
-    echo "$(rbenv version | awk '{print $1}')"
   fi
 
   if (( $+commands[rvm-prompt] ))
@@ -64,11 +63,11 @@ rb_prompt() {
     echo "%{$fg_bold[yellow]%}$(ruby_version)%{$reset_color%} "
   else
     echo ""
-  #  version=$(rbenv version-name 2> /dev/null)
-  #  if [[ "$version" == "" ]] then version="-" fi
-  ##   echo "%{$fg_bold[yellow]%}$version%{$reset_color%}"
-  ## else
-  ##   echo ""
+  #   version=$(rbenv version-name 2> /dev/null)
+  #   if [[ "$version" == "" ]] then version="-" fi
+  # 	echo "%{$fg_bold[yellow]%}$version%{$reset_color%}"
+  # else
+  #   echo ""
   fi
   echo "%{$fg_bold[yellow]%}%n%{$reset_color%}"
 }
