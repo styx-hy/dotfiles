@@ -63,9 +63,9 @@ rb_prompt() {
     echo "%{$fg_bold[yellow]%}$(ruby_version)%{$reset_color%} "
   else
     echo ""
-  #   version=$(rbenv version-name 2> /dev/null)
-  #   if [[ "$version" == "" ]] then version="-" fi
-  # 	echo "%{$fg_bold[yellow]%}$version%{$reset_color%}"
+    version=$(rbenv version-name 2> /dev/null)
+    if [[ "$version" == "" ]] then version="-" fi
+  	echo "%{$fg_bold[yellow]%}$version%{$reset_color%}"
   # else
   #   echo ""
   fi
