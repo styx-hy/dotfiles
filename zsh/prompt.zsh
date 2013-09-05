@@ -68,7 +68,7 @@ rb_prompt() {
   	echo "%{$fg_bold[yellow]%}$version%{$reset_color%}"
   # else
   #   echo ""
-  fi
+  # fi
   echo "%{$fg_bold[yellow]%}%n%{$reset_color%}"
 }
 
