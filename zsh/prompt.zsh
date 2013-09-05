@@ -48,14 +48,14 @@ need_push () {
 }
 
 rb_prompt(){
-  if (( $+commands[rbenv] ))
-  then
-    version=$(rbenv version-name 2> /dev/null)
-    if [[ "$version" == "" ]] then version="-" fi
-  	echo "%{$fg_bold[yellow]%}$version%{$reset_color%}"
+  # if (( $+commands[rbenv] ))
+  # then
+  #   version=$(rbenv version-name 2> /dev/null)
+  #   if [[ "$version" == "" ]] then version="-" fi
+  # 	echo "%{$fg_bold[yellow]%}$version%{$reset_color%}"
   # else
   #   echo ""
-  fi
+  # fi
   echo "%{$fg_bold[yellow]%}%n%{$reset_color%}"
 }
 

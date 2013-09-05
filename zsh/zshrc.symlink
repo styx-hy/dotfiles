@@ -18,6 +18,7 @@ for file in ${prefunc_files}
 do
   source $file
 done
+unset prefunc_files
 
 # all of our zsh files
 typeset -U config_files

@@ -1,13 +1,14 @@
 # vim: set ft=tmux:
 
 set -g base-index 1
+set -g default-command /bin/zsh
 
 # set prefix to `
 unbind-key C-b
-set-option -g prefix '$'
+set-option -g prefix `
 #set -g prefix C-x
 # press ` for 2 times to get `
-bind '$' send-prefix
+bind ` send-prefix
 # use ; for command prompt
 unbind :
 unbind \;

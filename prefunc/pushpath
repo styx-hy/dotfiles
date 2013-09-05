@@ -1,5 +1,21 @@
 pushpath() {
-    if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
-        PATH="$1${PATH:+":$PATH:"}"
-    fi
+    # Use zsh expansion to convert PATH into array
+    PATH_LIST=(${(s.:.)PATH})
+    # First remove self and then add to head of array
+    #
+    # `(@)'
+    #
+    #     Put array elements into separate words
+    #
+    # `${name:#pattern}'
+    #
+    #     In case of array, remove the matching element specified with `pattern'
+    #
+    # `j:string:'
+    #
+    #     Join array using `string' as separator. If `string' is a colon,
+    #     use '.' to separate flags
+    PATH="$1":${(j.:.)${(@)PATH_LIST:#$1}}
+
+    unset PATH_LIST
 }
