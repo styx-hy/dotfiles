@@ -21,13 +21,16 @@ bind k confirm-before kill-pane
 unbind [
 bind Escape copy-mode
 
-setw -g mode-keys vi
+# setw -g mode-keys vi
 setw -g xterm-keys on
 unbind %
 bind _ split-window -v
 bind | split-window -h
 # update "terminal window" title
 set-option -g set-titles on
+
+# scrollback buffer size increase
+set -g history-limit 10000
 
 # I rely on zsh to rename window title
 setw -g automatic-rename off
