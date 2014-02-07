@@ -2,9 +2,17 @@
 #   Made possible through contributions from generous benefactors like
 #   `brew install coreutils`
 if [ "$(uname -s)" = "Darwin" ]; then
-  alias lsll="gls"
+    if $(gls &>/dev/null); then
+	alias ls="gls -F --color"
+	alias l="gls -lAh --color"
+	alias ll="gls -l --color"
+	alias la='gls -A --color'
+    fi
 else
-  alias lsll="ls"
+    alias ls="ls -F --color"
+    alias l="ls -lAh --color"
+    alias ll="ls -l --color"
+    alias la='ls -A --color'
 fi
 
 if $(lsll &>/dev/null)
