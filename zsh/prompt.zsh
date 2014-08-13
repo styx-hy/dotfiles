@@ -77,7 +77,7 @@ directory_name(){
 }
 
 host_name() {
-  echo "%{$fg_bold[magenta]%}%m%{$reset_color%}"
+  echo "%{$fg_bold[magenta]%}%M%{$reset_color%}"
 }
 
 export PROMPT=$'\n$(rb_prompt) at $(host_name) in $(directory_name) $(git_dirty)$(need_push)\n› '
