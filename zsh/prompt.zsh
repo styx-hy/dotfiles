@@ -49,6 +49,7 @@ need_push () {
 ruby_version() {
   if (( $+commands[rbenv] ))
   then
+    echo "$(rbenv version | awk '{print $1}')"
   fi
 
   if (( $+commands[rvm-prompt] ))
@@ -58,17 +59,12 @@ ruby_version() {
 }
 
 rb_prompt() {
-  if ! [[ -z "$(ruby_version)" ]]
-  then
-    echo "%{$fg_bold[yellow]%}$(ruby_version)%{$reset_color%} "
-  else
-    echo ""
-    version=$(rbenv version-name 2> /dev/null)
-    if [[ "$version" == "" ]] then version="-" fi
-  	echo "%{$fg_bold[yellow]%}$version%{$reset_color%}"
-  # else
-  #   echo ""
-  # fi
+#  if ! [[ -z "$(ruby_version)" ]]
+#  then
+#    echo "%{$fg_bold[yellow]%}$(ruby_version)%{$reset_color%} "
+#  else
+#    echo ""
+#  fi
   echo "%{$fg_bold[yellow]%}%n%{$reset_color%}"
 }
 
@@ -77,7 +73,7 @@ directory_name(){
 }
 
 host_name() {
-  echo "%{$fg_bold[magenta]%}%M%{$reset_color%}"
+  echo "%{$fg_bold[magenta]%}%m%{$reset_color%}"
 }
 
 export PROMPT=$'\n$(rb_prompt) at $(host_name) in $(directory_name) $(git_dirty)$(need_push)\n› '
