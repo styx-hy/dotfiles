@@ -23,4 +23,5 @@ then
   alias la='lsll -A --color'
 fi
 
+alias tmux="TERM=screen-256color tmux"
 alias tat="tmux attach-session -t"
