@@ -5,3 +5,6 @@ if [[ "$EDITOR" == "" ]] ; then
   # STYX Use emacs for my editor
   export EDITOR='emacsclient -n'
 fi
+
+# make `less' more friendly
+LESSHISTFILE=/dev/null
