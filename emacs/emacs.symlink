@@ -404,9 +404,6 @@ instead."
 
 
 ;;; ** tramp
-;; (setq tramp-ssh-controlmaster-options (concat "-o ControlPath=~/.ssh/cm_socket/%h:%p "
-;; 					      "-o ControlMaster=auto -o ControlPersist=no"))
-(setq tramp-ssh-controlmaster-options "")
 (setq tramp-shell-prompt-pattern "\\(?:^\\|
 \\)[^]#$%>›\n]*#?[]#$%>›] *\\(\\[[0-9;]*[a-zA-Z] *\\)*")
 
@@ -424,11 +421,11 @@ instead."
   (let ((yas/prompt-functions '(yas/completing-prompt)))
     ad-do-it))
 (add-hook 'c-mode-hook
-	  '(lambda ()
-	     (yas-minor-mode)))
+	  (lambda ()
+	    (yas-minor-mode)))
 (add-hook 'org-mode-hook
-	  '(lambda ()
-	     (yas-minor-mode)))
+	  (lambda ()
+	    (yas-minor-mode)))
 ;; (yas-global-mode 1)
 (defun yas-ido-expand ()
   "Lets you select (and expand) a yasnippet key"
@@ -647,8 +644,8 @@ This is the same as using \\[set-mark-command] with the prefix argument."
       "* TODO %?
   %u
   %a"))))
- '(org-default-notes-file "~/Dropbox/notes/todo.org")
- '(org-directory "~/Dropbox/notes")
+ '(org-default-notes-file "~/Notes/todo.org")
+ '(org-directory "~/Notes")
  '(split-height-threshold 120)
  '(syslog-debug-face
    (quote
@@ -939,6 +936,7 @@ unwanted space when exporting org-mode to html."
 			     (progn
 			       (require 'auto-complete-config)
 			       (ac-linum-workaround))))
+(add-hook 'org-mode-hook (lambda () (linum-mode 0)))
 
 ;;; ** slime & scheme
 
