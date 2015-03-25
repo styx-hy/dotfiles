@@ -1,12 +1,12 @@
 # Add go to $PATH
-# if [[ -d "$HOME/zion/go/bin" ]]; then
-#      PATH="$HOME/zion/go/bin":$PATH
+# if [[ -d "$HOME/p/go/bin" ]]; then
+#      PATH="$HOME/p/go/bin":$PATH
 # fi
-appendpath "$HOME/zion/go/bin"
+appendpath "$HOME/p/go/bin"
 
-# if [[ -d "$HOME/zion/letsgo" ]]; then
-#     export GOPATH=$HOME/zion/letsgo
+# if [[ -d "$HOME/p/letsgo" ]]; then
+#     export GOPATH=$HOME/p/letsgo
 #     export PATH=$PATH:$GOPATH/bin
 # fi
-export GOPATH="$HOME/zion/letsgo"
+export GOPATH="$HOME/p/iku"
 appendpath "$GOPATH/bin"
