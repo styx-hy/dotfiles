@@ -51,6 +51,13 @@ set encoding=utf-8 " Necessary to show Unicode glyphs
 Plugin 'rking/ag.vim'
 nmap <F3> :Ag<space><cword>
 
+" NERD Commenter
+Plugin 'scrooloose/nerdcommenter'
+filetype plugin on
+let g:mapleader=','
+"let g:NERDCustomDelimiters = { 'c' : { 'left': '/* ', 'right': ' */', 'leftAlt': '// ' }}
+let g:NERDSpaceDelims = 1
+
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
