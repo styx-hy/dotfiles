@@ -952,8 +952,8 @@ unwanted space when exporting org-mode to html."
 
 	 :html-preamble "<div class=\"header\">
 <div class=\"header-menu\">
-<ul class=\"org-ul\">
-<li><a href=\"about.html\">ABOUT</a>
+<ul>
+<li><a href=\"about.html\"><b>ABOUT</b></a>
 </li>
 </ul>
 </div>
