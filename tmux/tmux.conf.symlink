@@ -28,7 +28,7 @@ unbind %
 bind _ split-window -v
 bind | split-window -h
 # update "terminal window" title
-set-option -g set-titles on
+set -g set-titles on
 
 # scrollback buffer size increase
 set -g history-limit 10000
@@ -46,8 +46,8 @@ setw -g utf8 on
 set -g terminal-overrides "*88col*:colors=88,*256col*:colors=256,xterm*:colors=256"
 
 # aliasing tmux to "tmux -2" should also do the trick
-set -g default-terminal "screen-256color"
-#set -g default-terminal "xterm"
+# set -g default-terminal "screen-256color"
+set -g default-terminal "xterm-256color"
 set -g status-utf8 on
 set -g status-justify centre
 set -g status-bg default
