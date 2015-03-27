@@ -26,7 +26,7 @@
 (setq initial-frame-alist
       `((height . 60)
 	(width . 150)))
-;; (setq-default line-spacing 2)
+(setq line-spacing 0)
 
 ;; scrolling
 (setq scroll-margin 10)
@@ -38,8 +38,12 @@
 ;; font
 ;; (add-to-list 'default-frame-alist
 ;; 	     '(font . "PragmataPro-14"))
-(add-to-list 'default-frame-alist
-	     '(font . "Monaco-12"))
+
+(if (eq system-type 'darwin)
+    (set-face-attribute 'default nil :family "CamingoCode" :height 130)
+    ;; (set-face-attribute 'default nil :family "DejaVu Sans Mono" :height 130)
+  (add-to-list 'default-frame-alist
+	       '(font . "Monaco-12")))
 
 ;; backup
 (setq backup-by-copying t
@@ -206,18 +210,74 @@
 ;;; ** lua-mode
 ;; use an indentation width of two spaces
 (setq lua-indent-level 2)
-;;; ** powerline
 
-;; (add-to-list 'load-path "~/.emacs.d/powerline")
-;; (add-hook 'after-init-hook (lambda ()
-;; 			     (progn
-;; 			       (require 'powerline)
-;; 			       (when window-system
-;; 				 (set-face-attribute 'mode-line nil
-;; 				 		     ;; :background "OliveDrab3"
-;; 				 		     :foreground "black")
-;; 				 (powerline-default-theme))
-;; 				)))
+;;; ** powerline
+;; (add-hook 'after-init-hook
+;; 	  (lambda ()
+;; 	    (progn
+;; 	      (require 'powerline)
+;; 	      (when window-system
+;; 		(progn
+;; 		(set-face-attribute 'mode-line nil
+;; 				    ;; :background "OliveDrab2"
+;; 				    ))
+;; 		))))
+;; (defface my-powerline-active1 '((t (:foreground "0D6E0E" :background "OliveDrab2" :inherit mode-line))) :group 'powerline)
+
+
+(defun powerline-my-theme ()
+  "Setup the default mode-line."
+  (interactive)
+  (setq-default mode-line-format
+                '("%e"
+                  (:eval
+                   (let* ((active (powerline-selected-window-active))
+                          (mode-line (if active 'mode-line 'mode-line-inactive))
+                          (face1 (if active 'powerline-active1 'powerline-inactive1))
+                          (face2 (if active 'powerline-active2 'powerline-inactive2))
+                          (separator-left (intern (format "powerline-%s-%s"
+							  'nil
+                                                          (car powerline-default-separator-dir))))
+                          (separator-right (intern (format "powerline-%s-%s"
+                                                           'nil
+                                                           (cdr powerline-default-separator-dir))))
+                          (lhs (list (powerline-raw "%*" nil 'l)
+                                     (when powerline-display-buffer-size
+                                       (powerline-buffer-size nil 'l))
+                                     (when powerline-display-mule-info
+                                       (powerline-raw mode-line-mule-info nil 'l))
+                                     (powerline-buffer-id nil 'l)
+                                     (when (and (boundp 'which-func-mode) which-func-mode)
+                                       (powerline-raw which-func-format nil 'l))
+                                     (powerline-raw " ")
+                                     (funcall separator-left mode-line face1)
+                                     (when (boundp 'erc-modified-channels-object)
+                                       (powerline-raw erc-modified-channels-object face1 'l))
+                                     (powerline-major-mode face1 'l)
+                                     (powerline-process face1)
+                                     (powerline-minor-modes face1 'l)
+                                     (powerline-narrow face1 'l)
+                                     (powerline-raw " " face1)
+                                     (funcall separator-left face1 face2)
+                                     (powerline-vc face2 'r)
+                                     (when (bound-and-true-p nyan-mode)
+                                       (powerline-raw (list (nyan-create)) face2 'l))))
+                          (rhs (list (powerline-raw global-mode-string face2 'r)
+                                     (funcall separator-right face2 face1)
+				     (unless window-system
+				       (powerline-raw (char-to-string #xe0a1) face1 'l))
+				     (powerline-raw "%4l" face1 'l)
+				     (powerline-raw ":" face1 'l)
+				     (powerline-raw "%3c" face1 'r)
+				     (funcall separator-right face1 mode-line)
+				     (powerline-raw " ")
+				     (powerline-raw "%6p" nil 'r)
+                                     (when powerline-display-hud
+                                       (powerline-hud face2 face1)))))
+		     (concat (powerline-render lhs)
+			     (powerline-fill face2 (powerline-width rhs))
+			     (powerline-render rhs)))))))
+(powerline-my-theme)
 
 ;; hl-line-mode
 ;; (require 'hl-line)
@@ -923,14 +983,23 @@ unwanted space when exporting org-mode to html."
 )))
 
 ;;; ** linum-mode
-(global-linum-mode 1)
+;; (global-linum-mode 1)
 ;; seperate line numbers from text
-(setq linum-format
-      (lambda (line)
-	(propertize (format
-		     (let ((w (length (number-to-string
-				       (count-lines (point-min) (point-max))))))
-		       (concat " %" (number-to-string w) "d ")) line) 'face 'linum)))
+(add-hook 'linum-before-numbering-hook
+	  (lambda ()
+	    (setq-local linum-format-string
+			(let ((w (length (number-to-string
+					  (count-lines (point-min) (point-max))))))
+			  (concat " %" (number-to-string w) "d")))))
+
+(defun linum-format-func (line)
+  (concat
+   (propertize (format linum-format-string line) 'face 'linum)
+   ;; (propertize " " 'face 'mode-line)
+   ))
+(setq linum-format 'linum-format-func)
+(global-linum-mode 1)
+
 (column-number-mode 1)
 (add-hook 'linum-mode-hook (lambda ()
 			     (progn
@@ -1144,7 +1213,6 @@ unwanted space when exporting org-mode to html."
 (add-to-list 'custom-theme-load-path "~/.emacs.d/molokai-theme")
 ;; (setq molokai-theme-kit t)
 ;; (load-theme 'molokai t)
-;; (setq linum-format "%4d ")
 ;; (toggle-indicate-empty-lines nil)
 ;; (setq-default mode-line-format
 ;; 	      (list
@@ -1191,9 +1259,10 @@ unwanted space when exporting org-mode to html."
 ;; 	       ;; minor-mode-alist  ;; list of minor modes
 ;; 	       "%-" ;; fill with '-'
 ;; 	       ))
-(set-face-attribute 'mode-line nil :box nil)
-(set-face-attribute 'mode-line-inactive nil :box nil)
 ;; (when window-system
 ;;   (load-theme 'yamonokai t))
 (load-theme 'monokai t)
-;; (Load-theme 'solarized-dark t)
+;; (load-theme 'solarized-light t)
+
+(set-face-attribute 'mode-line nil :box nil)
+(set-face-attribute 'mode-line-inactive nil :box nil)
