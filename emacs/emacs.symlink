@@ -136,6 +136,10 @@
 			 ("melpa" . "http://melpa.org/packages/")
 			 ("org" . "http://orgmode.org/elpa/")))
 
+;;; ** evil
+ (require 'evil)
+ (evil-mode 1)
+
 ;;; ** Git
 
 ;; (add-to-list 'load-path "/usr/local/share/git-core/contrib/emacs")
