@@ -87,6 +87,7 @@
 
 ;; controls
 (windmove-default-keybindings 'meta)
+;; (setq next-line-add-newlines t)
 
 ;; global key rebinding
 (global-set-key (kbd "M-o") 'other-window)
@@ -97,10 +98,12 @@
 (global-set-key (kbd "C-x b") 'ibuffer)
 (global-set-key (kbd "C-=") 'cssh-term-remote-open)
 
-(global-set-key (kbd "s-p") 'previous-line)
-(global-set-key (kbd "s-n") 'next-line)
-(global-set-key (kbd "s-b") 'backward-char)
-(global-set-key (kbd "s-f") 'forward-char)
+(global-set-key (kbd "M-l") 'forward-char)
+(global-set-key (kbd "M-h") 'backward-char)
+(global-set-key (kbd "M-k") 'previous-line)
+(global-set-key (kbd "M-j") 'next-line)
+
+(global-set-key (kbd "M-a") 'execute-extended-command)
 (global-set-key (kbd "s-o") 'find-file)
 
 ;; desktop
@@ -137,9 +140,8 @@
 			 ("org" . "http://orgmode.org/elpa/")))
 
 ;;; ** evil
- (require 'evil)
- (evil-mode 1)
-
+(require 'evil)
+(evil-mode 1)
 ;;; ** Git
 
 ;; (add-to-list 'load-path "/usr/local/share/git-core/contrib/emacs")

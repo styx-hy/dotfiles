@@ -1,7 +1,7 @@
 # vim: set ft=tmux:
 
 set -g base-index 1
-set -g default-command /bin/zsh
+set -g default-command "reattach-to-user-namespace -l $SHELL"
 
 # set prefix to `
 unbind-key C-b
@@ -34,7 +34,12 @@ set -g set-titles on
 set -g history-limit 10000
 
 # I rely on zsh to rename window title
-setw -g automatic-rename off
+# setw -g automatic-rename off
+setw -g automatic-rename on
+# setw -g automatic-rename-format "#{=10:pane_current_path}"
+setw -g automatic-rename-format "#{pane_current_command}"
+# unbind c
+# bind c run "(tmux new-window -c #{pane_current_path} -n $(basename #{pane_current_path}))"
 
 set-option -g visual-activity on
 setw -g monitor-activity on
