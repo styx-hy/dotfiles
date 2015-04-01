@@ -1,5 +1,7 @@
 syntax on
 
+set rtp+=$GOROOT/misc/vim
+
 " Wrap gitcommit file types at the appropriate length
 filetype indent plugin on
 set hlsearch
@@ -111,3 +113,7 @@ if has('gui_running')
 	set background=light
 	colorscheme solarized " must be set after vundle#end()
 endif
+
+" Key bindings
+nnoremap <C-J> ciW<CR><Esc>:if match( @", "^\\s*$") < 0<Bar>exec "norm P-$diw+"<Bar>endif<CR>
+noremap % v%
