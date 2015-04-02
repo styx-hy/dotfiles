@@ -8,3 +8,4 @@ fi
 
 # make `less' more friendly
 LESSHISTFILE=/dev/null
+export LESS="-F -X -R"
