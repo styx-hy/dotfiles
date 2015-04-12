@@ -1,5 +1,11 @@
 syntax on
 
+if has('gui_macvim')
+	let $GOPATH = expand("~/p/iku")
+	let $GOROOT = expand("~/p/go")
+	let $PATH .= ':/Users/styx/p/go/bin:/Users/styx/p/iku/bin'
+endif
+
 set rtp+=$GOROOT/misc/vim
 
 " Wrap gitcommit file types at the appropriate length
@@ -9,7 +15,7 @@ hi Search guibg=LightBlue
 set nu
 set paste
 set incsearch
-colorscheme peachpuff
+set autochdir
 
 " Tell vim to remember certain things when we exit
 "  '10  :  marks will be remembered for up to 10 previously edited files
@@ -19,15 +25,15 @@ colorscheme peachpuff
 "  n... :  where to save the viminfo files
 set viminfo='10,\"100,:20,%,n~/.viminfo
 function! ResCur()
-  if line("'\"") <= line("$")
-    normal! g`"
-    return 1
-  endif
+	if line("'\"") <= line("$")
+		normal! g`"
+		return 1
+	endif
 endfunction
 
 augroup resCur
-  autocmd!
-  autocmd BufWinEnter * call ResCur()
+	autocmd!
+	autocmd BufWinEnter * call ResCur()
 augroup END
 
 set nocompatible
@@ -42,7 +48,9 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
 
+" vim-go
 Plugin 'fatih/vim-go'
+let g:go_fmt_command = expand("goimports")
 
 " vim-powerline settings
 Plugin 'Lokaltog/vim-powerline'
@@ -70,16 +78,50 @@ let g:ycm_enable_diagnostic_highlighting = 0
 " fugitive
 " Plugin 'tpope/vim-fugitive'
 
-" ctrlp
+" ctrlp-cmatcher
+Plugin 'JazzCore/ctrlp-cmatcher'
+
+"ctrlp
 Plugin 'kien/ctrlp.vim'
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip
-let g:ctrlp_user_command = 'find %s -type f'
+let g:ctrlp_cmd = 'CtrlPMRU'
+let g:ctrlp_match_func  = {'match' : 'matcher#cmatch'}
+let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
 let g:ctrlp_working_path_mode = 'ra'
+let g:ctrlp_max_height = 10			" maxiumum height of match window
+let g:ctrlp_switch_buffer = 'et'	" jump to a file if it's open already
+let g:ctrlp_mruf_max=450 			" number of recently opened files
+let g:ctrlp_max_files=0  			" do not limit the number of searchable files
+let g:ctrlp_use_caching = 1
+let g:ctrlp_clear_cache_on_exit = 0
+let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
+" When using globpath()
 let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\v[\/]\.(git|hg|svn)$',
-  \ 'file': '\v\.(exe|so|dll|o|ko)$',
-  \ }
+			\ 'dir':  '\v[\/]\.(git|hg|svn)$',
+			\ 'file': '\v\.(exe|so|dll|o|ko)$',
+			\ }
 nmap <c-b> :CtrlPBuffer<ENTER>
+
+let g:ctrlp_buftag_types = {
+			\ 'go'     	   : '--language-force=go --golang-types=ftv',
+			\ 'coffee'     : '--language-force=coffee --coffee-types=cmfvf',
+			\ 'markdown'   : '--language-force=markdown --markdown-types=hik',
+			\ 'objc'       : '--language-force=objc --objc-types=mpci',
+			\ 'rc'         : '--language-force=rust --rust-types=fTm'
+			\ }
+
+func! MyCtrlPTag()
+	let g:ctrlp_prompt_mappings = {
+				\ 'AcceptSelection("e")': ['<cr>', '<2-LeftMouse>'],
+				\ 'AcceptSelection("t")': ['<c-t>'],
+				\ }
+	CtrlPBufTag
+endfunc
+command! MyCtrlPTag call MyCtrlPTag()
+
+" command-t
+Plugin 'wincent/Command-T'
+let g:CommandTMaxHeight = 10
 
 " GitGutter
 Plugin 'airblade/vim-gitgutter'
@@ -91,6 +133,14 @@ highlight GitGutterChangeDelete ctermfg=yellow
 
 " Solarized
 Plugin 'altercation/vim-colors-solarized'
+
+" mololkai
+Plugin 'tomasr/molokai'
+let g:molokai_original = 1
+let g:rehash256 = 1
+
+" vim-easymotion
+Plugin 'Lokaltog/vim-easymotion'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -109,9 +159,28 @@ filetype plugin indent on    " required
 
 " Settings of MacVim
 set guifont=Monaco:h12
-if has('gui_running')
+if has('gui_macvim')
 	set background=light
-	colorscheme solarized " must be set after vundle#end()
+	" colorscheme solarized " must be set after vundle#end()
+	set guioptions-=m  "no menu
+	set guioptions-=T  "no toolbar
+	set guioptions-=l
+	set guioptions-=L
+	set guioptions-=r  "no scrollbar
+	set guioptions-=R
+
+	let macvim_skip_colorscheme=1
+	let g:molokai_original=1
+	colorscheme molokai
+	highlight SignColumn guibg=#272822
+
+	" Open goto symbol on current buffer
+	nmap <D-r> :MyCtrlPTag<cr>
+	imap <D-r> <esc>:MyCtrlPTag<cr>
+
+	" Open goto symbol on all buffers
+	nmap <D-R> :CtrlPBufTagAll<cr>
+	imap <D-R> <esc>:CtrlPBufTagAll<cr>
 endif
 
 " Key bindings
