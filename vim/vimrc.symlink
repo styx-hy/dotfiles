@@ -16,6 +16,7 @@ set nu
 set paste
 set incsearch
 set autochdir
+set tags=tags; " the semicolon here allows vim to search upward directory for tag file
 
 " Tell vim to remember certain things when we exit
 "  '10  :  marks will be remembered for up to 10 previously edited files
