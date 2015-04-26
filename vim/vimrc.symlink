@@ -143,6 +143,9 @@ let g:rehash256 = 1
 " vim-easymotion
 Plugin 'Lokaltog/vim-easymotion'
 
+" vim-surround
+Plugin 'tpope/vim-surround'
+
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
