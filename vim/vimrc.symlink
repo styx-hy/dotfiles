@@ -125,6 +125,7 @@ command! MyCtrlPTag call MyCtrlPTag()
 " command-t
 Plugin 'wincent/Command-T'
 let g:CommandTMaxHeight = 10
+nnoremap <silent> <Leader>s :CommandTTag<CR>
 
 " GitGutter
 Plugin 'airblade/vim-gitgutter'
