@@ -5,6 +5,8 @@ if has('gui_macvim')
 	let $GOROOT = expand("~/p/go")
 	let $PATH .= ':/Users/styx/p/go/bin:/Users/styx/p/iku/bin'
 endif
+set backupdir=~/.saves,./.backup,.
+set directory=~/.saves,./.backup,.
 
 set rtp+=$GOROOT/misc/vim
 
@@ -186,6 +188,9 @@ if has('gui_macvim')
 	nmap <D-R> :CtrlPBufTagAll<cr>
 	imap <D-R> <esc>:CtrlPBufTagAll<cr>
 endif
+
+set tw=79 " textwidth 79, use `gq` to auto wrap selection
+set formatoptions+=t
 
 " Key bindings
 nnoremap <C-J> ciW<CR><Esc>:if match( @", "^\\s*$") < 0<Bar>exec "norm P-$diw+"<Bar>endif<CR>
