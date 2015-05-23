@@ -12,10 +12,10 @@ set rtp+=$GOROOT/misc/vim
 
 " Wrap gitcommit file types at the appropriate length
 filetype indent plugin on
-set hlsearch
 hi Search guibg=LightBlue
+set hlsearch
 set nu
-set paste
+set pastetoggle=<F2>
 set incsearch
 set autochdir
 set tags=tags; " the semicolon here allows vim to search upward directory for tag file
@@ -178,7 +178,9 @@ if has('gui_macvim')
 
 	let macvim_skip_colorscheme=1
 	let g:molokai_original=1
-	colorscheme molokai
+	" colorscheme molokai
+	set background=dark
+	colorscheme solarized
 	highlight SignColumn guibg=#272822
 
 	" Open goto symbol on current buffer
@@ -195,4 +197,5 @@ set formatoptions+=t
 
 " Key bindings
 nnoremap <C-J> ciW<CR><Esc>:if match( @", "^\\s*$") < 0<Bar>exec "norm P-$diw+"<Bar>endif<CR>
+nnoremap dc bde
 noremap % v%
