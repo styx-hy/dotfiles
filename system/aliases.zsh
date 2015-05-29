@@ -23,5 +23,9 @@ then
   alias la='lsll -A --color'
 fi
 
+if $(nvim -v &>/dev/null); then
+  alias vim="nvim"
+fi
+
 alias tmux="TERM=screen-256color tmux"
 alias tat="tmux attach-session -t"
