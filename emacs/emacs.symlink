@@ -544,7 +544,7 @@ instead."
 	  (lambda ()
 	    (interactive)
 	    ;; (variable-pitch-mode t)
-	    (buffer-face-set '(:family "TeX Gyre Termes" :height 150))
+	    (buffer-face-set '(:family "TeX Gyre Termes" :height 180))
 	    (dolist (face '(org-block-begin-line
 			    org-block-end-line
 			    org-meta-line
