@@ -40,7 +40,7 @@
 ;; 	     '(font . "PragmataPro-14"))
 
 (if (eq system-type 'darwin)
-    (set-face-attribute 'default nil :family "CamingoCode" :height 130)
+    (set-face-attribute 'default nil :family "CamingoCode" :height 130) ;
     ;; (set-face-attribute 'default nil :family "DejaVu Sans Mono" :height 130)
   (add-to-list 'default-frame-alist
 	       '(font . "Monaco-12")))
@@ -142,6 +142,22 @@
 ;;; ** evil
 (require 'evil)
 (evil-mode 1)
+;; change color in different state
+(require 'cl)
+(lexical-let ((default-color (cons (face-background 'mode-line)
+                                      (face-foreground 'mode-line))))
+     (add-hook 'post-command-hook
+       (lambda ()
+         (let ((color (cond ((minibufferp) default-color)
+                            ((evil-insert-state-p) '("#e80000" . "#ffffff"))
+                            ((evil-emacs-state-p)  '("#444488" . "#ffffff"))
+                            ((buffer-modified-p)   '("#006fa0" . "#ffffff"))
+                            (t default-color))))
+           (set-face-background 'mode-line (car color))
+           (set-face-foreground 'mode-line (cdr color))))))
+
+;;; ** evil-easymotion
+(evilem-default-keybindings ",")
 ;;; ** Git
 
 ;; (add-to-list 'load-path "/usr/local/share/git-core/contrib/emacs")
@@ -231,59 +247,59 @@
 ;; (defface my-powerline-active1 '((t (:foreground "0D6E0E" :background "OliveDrab2" :inherit mode-line))) :group 'powerline)
 
 
-(defun powerline-my-theme ()
-  "Setup the default mode-line."
-  (interactive)
-  (setq-default mode-line-format
-                '("%e"
-                  (:eval
-                   (let* ((active (powerline-selected-window-active))
-                          (mode-line (if active 'mode-line 'mode-line-inactive))
-                          (face1 (if active 'powerline-active1 'powerline-inactive1))
-                          (face2 (if active 'powerline-active2 'powerline-inactive2))
-                          (separator-left (intern (format "powerline-%s-%s"
-							  'nil
-                                                          (car powerline-default-separator-dir))))
-                          (separator-right (intern (format "powerline-%s-%s"
-                                                           'nil
-                                                           (cdr powerline-default-separator-dir))))
-                          (lhs (list (powerline-raw "%*" nil 'l)
-                                     (when powerline-display-buffer-size
-                                       (powerline-buffer-size nil 'l))
-                                     (when powerline-display-mule-info
-                                       (powerline-raw mode-line-mule-info nil 'l))
-                                     (powerline-buffer-id nil 'l)
-                                     (when (and (boundp 'which-func-mode) which-func-mode)
-                                       (powerline-raw which-func-format nil 'l))
-                                     (powerline-raw " ")
-                                     (funcall separator-left mode-line face1)
-                                     (when (boundp 'erc-modified-channels-object)
-                                       (powerline-raw erc-modified-channels-object face1 'l))
-                                     (powerline-major-mode face1 'l)
-                                     (powerline-process face1)
-                                     (powerline-minor-modes face1 'l)
-                                     (powerline-narrow face1 'l)
-                                     (powerline-raw " " face1)
-                                     (funcall separator-left face1 face2)
-                                     (powerline-vc face2 'r)
-                                     (when (bound-and-true-p nyan-mode)
-                                       (powerline-raw (list (nyan-create)) face2 'l))))
-                          (rhs (list (powerline-raw global-mode-string face2 'r)
-                                     (funcall separator-right face2 face1)
-				     (unless window-system
-				       (powerline-raw (char-to-string #xe0a1) face1 'l))
-				     (powerline-raw "%4l" face1 'l)
-				     (powerline-raw ":" face1 'l)
-				     (powerline-raw "%3c" face1 'r)
-				     (funcall separator-right face1 mode-line)
-				     (powerline-raw " ")
-				     (powerline-raw "%6p" nil 'r)
-                                     (when powerline-display-hud
-                                       (powerline-hud face2 face1)))))
-		     (concat (powerline-render lhs)
-			     (powerline-fill face2 (powerline-width rhs))
-			     (powerline-render rhs)))))))
-(powerline-my-theme)
+;; (defun powerline-my-theme ()
+;;   "Setup the default mode-line."
+;;   (interactive)
+;;   (setq-default mode-line-format
+;;                 '("%e"
+;;                   (:eval
+;;                    (let* ((active (powerline-selected-window-active))
+;;                           (mode-line (if active 'mode-line 'mode-line-inactive))
+;;                           (face1 (if active 'powerline-active1 'powerline-inactive1))
+;;                           (face2 (if active 'powerline-active2 'powerline-inactive2))
+;;                           (separator-left (intern (format "powerline-%s-%s"
+;; 							  'nil
+;;                                                           (car powerline-default-separator-dir))))
+;;                           (separator-right (intern (format "powerline-%s-%s"
+;;                                                            'nil
+;;                                                            (cdr powerline-default-separator-dir))))
+;;                           (lhs (list (powerline-raw "%*" nil 'l)
+;;                                      (when powerline-display-buffer-size
+;;                                        (powerline-buffer-size nil 'l))
+;;                                      (when powerline-display-mule-info
+;;                                        (powerline-raw mode-line-mule-info nil 'l))
+;;                                      (powerline-buffer-id nil 'l)
+;;                                      (when (and (boundp 'which-func-mode) which-func-mode)
+;;                                        (powerline-raw which-func-format nil 'l))
+;;                                      (powerline-raw " ")
+;;                                      (funcall separator-left mode-line face1)
+;;                                      (when (boundp 'erc-modified-channels-object)
+;;                                        (powerline-raw erc-modified-channels-object face1 'l))
+;;                                      (powerline-major-mode face1 'l)
+;;                                      (powerline-process face1)
+;;                                      (powerline-minor-modes face1 'l)
+;;                                      (powerline-narrow face1 'l)
+;;                                      (powerline-raw " " face1)
+;;                                      (funcall separator-left face1 face2)
+;;                                      (powerline-vc face2 'r)
+;;                                      (when (bound-and-true-p nyan-mode)
+;;                                        (powerline-raw (list (nyan-create)) face2 'l))))
+;;                           (rhs (list (powerline-raw global-mode-string face2 'r)
+;;                                      (funcall separator-right face2 face1)
+;; 				     (unless window-system
+;; 				       (powerline-raw (char-to-string #xe0a1) face1 'l))
+;; 				     (powerline-raw "%4l" face1 'l)
+;; 				     (powerline-raw ":" face1 'l)
+;; 				     (powerline-raw "%3c" face1 'r)
+;; 				     (funcall separator-right face1 mode-line)
+;; 				     (powerline-raw " ")
+;; 				     (powerline-raw "%6p" nil 'r)
+;;                                      (when powerline-display-hud
+;;                                        (powerline-hud face2 face1)))))
+;; 		     (concat (powerline-render lhs)
+;; 			     (powerline-fill face2 (powerline-width rhs))
+;; 			     (powerline-render rhs)))))))
+;; (powerline-my-theme)
 
 ;; hl-line-mode
 ;; (require 'hl-line)
@@ -524,6 +540,19 @@ instead."
 ;; (font-lock-add-keywords 'c-mode '(("for" . font-lock-keyword-face)))
 ;; (font-lock-add-keywords 'c-mode '(("while" . font-lock-keyword-face)))
 (global-font-lock-mode t)
+(add-hook 'org-mode-hook
+	  (lambda ()
+	    (interactive)
+	    ;; (variable-pitch-mode t)
+	    (buffer-face-set '(:family "TeX Gyre Termes" :height 150))
+	    (dolist (face '(org-block-begin-line
+			    org-block-end-line
+			    org-meta-line
+			    org-verbatim
+			    org-block-background))
+			  (set-face-attribute face nil :height 130 :inherit 'fixed-pitch))
+	    ;; (buffer-face-mode)
+	    ))
 ;; (setq font-lock-defaults t)
 
 ;; (when (and (fboundp 'semantic-mode)
@@ -1245,8 +1274,16 @@ unwanted space when exporting org-mode to html."
 ;; 	       ))
 ;; (when window-system
 ;;   (load-theme 'yamonokai t))
-(load-theme 'monokai t)
+;; (load-theme 'monokai t)
+(load-theme 'leuven t)
 ;; (load-theme 'solarized-light t)
 
 (set-face-attribute 'mode-line nil :box nil)
 (set-face-attribute 'mode-line-inactive nil :box nil)
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(org-code ((t (:background "#FDFFF7" :foreground "#006400" :family "Monaco"))))
+ '(org-default ((t (:background "#FFFFFF" :foreground "#333333" :family "TeX Gyre Termes")))))
