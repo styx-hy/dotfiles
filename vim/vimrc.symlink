@@ -185,7 +185,7 @@ filetype plugin indent on    " required
 " Put your non-Plugin stuff after this line
 
 " Settings of MacVim
-set guifont=Monaco:h12
+set guifont=PragmataPro:h14
 if has('gui_macvim')
 	set background=light
 	" colorscheme solarized " must be set after vundle#end()
@@ -214,6 +214,8 @@ endif
 
 set tw=79 " textwidth 79, use `gq` to auto wrap selection
 set formatoptions+=t
+
+let g:tex_flavor='latex'
 
 " Key bindings
 nnoremap <C-J> ciW<CR><Esc>:if match( @", "^\\s*$") < 0<Bar>exec "norm P-$diw+"<Bar>endif<CR>

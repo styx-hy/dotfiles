@@ -145,6 +145,9 @@ let g:rehash256 = 1
 
 " vim-easymotion
 Plugin 'Lokaltog/vim-easymotion'
+map  / <Plug>(easymotion-sn)
+omap / <Plug>(easymotion-tn)
+let g:EasyMotion_smartcase = 1
 
 " vim-surround
 Plugin 'tpope/vim-surround'
