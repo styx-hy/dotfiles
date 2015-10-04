@@ -6,3 +6,6 @@ atom.symlink/storage
 atom.symlink/themes
 
 git/gitconfig.symlink
+
+emacs/emacs.d.symlink/elpa/
+emacs/emacs.d.symlink/ac-comphist.dat

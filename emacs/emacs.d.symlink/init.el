@@ -37,15 +37,15 @@
 
 ;; font
 ;; (add-to-list 'default-frame-alist
-;; 	     '(font . "PragmataPro-14"))
+;; 	     '(font . "Monaco-14"))
 
 (if (eq system-type 'darwin)
     (progn
-      (dolist (charset '(kana han symbol cjk-misc bopomofo))
-	(set-fontset-font (frame-parameter nil 'font)
-			  charset (font-spec :family "PingFang SC" :size 12)))
       (add-to-list 'default-frame-alist
-		   '(font . "PragmataPro 16")))
+		   '(font . "PragmataPro 14"))
+      (dolist (charset '(kana han symbol cjk-misc bopomofo))
+	;; (set-fontset-font (frame-parameter nil 'font)
+	(set-fontset-font t charset (font-spec :family "PingFang SC" :size 14))))
    ;; (set-face-attribute 'default nil :family "DejaVu Sans Mono" :height 130)
   (add-to-list 'default-frame-alist
 	       '(font . "Monaco-12")))
@@ -510,9 +510,6 @@ instead."
 (add-hook 'c-mode-hook
 	  (lambda ()
 	    (yas-minor-mode)))
-(add-hook 'org-mode-hook
-	  (lambda ()
-	    (yas-minor-mode)))
 ;; (yas-global-mode 1)
 (defun yas-ido-expand ()
   "Lets you select (and expand) a yasnippet key"
@@ -545,19 +542,20 @@ instead."
 ;; (font-lock-add-keywords 'c-mode '(("for" . font-lock-keyword-face)))
 ;; (font-lock-add-keywords 'c-mode '(("while" . font-lock-keyword-face)))
 (global-font-lock-mode t)
-(add-hook 'org-mode-hook
-	  (lambda ()
-	    (interactive)
-	    ;; (variable-pitch-mode t)
-	    (buffer-face-set '(:family "TeX Gyre Termes" :height 180))
-	    (dolist (face '(org-block-begin-line
-			    org-block-end-line
-			    org-meta-line
-			    org-verbatim
-			    org-block-background))
-			  (set-face-attribute face nil :height 130 :inherit 'fixed-pitch))
-	    ;; (buffer-face-mode)
-	    ))
+;; (add-hook 'org-mode-hook
+;; 	  (lambda ()
+;; 	    (interactive)
+;; 	    ;; (variable-pitch-mode t)
+;; 	    (buffer-face-set '(:family "TeX Gyre Termes" :height 180))
+;; 	    (dolist (face '(org-block-begin-line
+;; 			    org-block-end-line
+;; 			    org-meta-line
+;; 			    org-verbatim
+;; 			    ;; org-block-background
+;; 			    ))
+;; 			  (set-face-attribute face nil :height 130 :inherit 'fixed-pitch))
+;; 	    ;; (buffer-face-mode)
+;; 	    ))
 ;; (setq font-lock-defaults t)
 
 ;; (when (and (fboundp 'semantic-mode)
@@ -782,7 +780,7 @@ This is the same as using \\[set-mark-command] with the prefix argument."
 (setq orgstruct-heading-prefix-regexp "^;;; *")
 (setq org-startup-truncated nil)
 
-(setq org-src-fontify-natively t)
+;; (setq org-src-fontify-natively t)
 
 ;; Someone says it is not necessary to do the `require' and also shouldn't
 ;; (require 'org-latex)
