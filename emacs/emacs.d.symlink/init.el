@@ -1315,7 +1315,8 @@ unwanted space when exporting org-mode to html."
 ;; (when window-system
 ;;   (load-theme 'yamonokai t))
 ;; (load-theme 'monokai t)
-(load-theme 'leuven t)
+(when window-system
+  (load-theme 'leuven t))
 ;; (load-theme 'solarized-light t)
 
 (set-face-attribute 'mode-line nil :box nil)
