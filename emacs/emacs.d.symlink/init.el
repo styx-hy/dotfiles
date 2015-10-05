@@ -152,6 +152,11 @@
 ;;; ** evil
 (require 'evil)
 (evil-mode 1)
+;; (add-hook 'evil-after-load-hook
+;;          (lambda ()
+;;          ;; config
+;;     ))
+
 ;; change color in different state
 (require 'cl)
 (lexical-let ((default-color (cons (face-background 'mode-line)
@@ -188,6 +193,12 @@
   "cv" 'evilnc-toggle-invert-comment-line-by-line
   "\\" 'evilnc-comment-operator ; if you prefer backslash key
 )
+;;; ** key-chord
+;; for mapping escape key in evil-mode
+(require 'key-chord)
+(setq key-chord-two-keys-delay 0.5)
+(key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
+(key-chord-mode 1)
 
 ;;; ** Git
 
