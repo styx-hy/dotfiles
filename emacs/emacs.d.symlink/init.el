@@ -41,14 +41,17 @@
 
 (if (eq system-type 'darwin)
     (progn
-      (add-to-list 'default-frame-alist
-		   '(font . "PragmataPro 14"))
+      (set-face-attribute 'default nil :family "Inconsolata")
+      (set-face-attribute 'default nil :height 160)
+      (set-face-attribute 'default nil :weight 'medium)
+      (set-face-attribute 'default nil :box nil)
       (dolist (charset '(kana han symbol cjk-misc bopomofo))
 	;; (set-fontset-font (frame-parameter nil 'font)
 	(set-fontset-font t charset (font-spec :family "PingFang SC" :size 14))))
    ;; (set-face-attribute 'default nil :family "DejaVu Sans Mono" :height 130)
   (add-to-list 'default-frame-alist
 	       '(font . "Monaco-12")))
+
 
 ;; backup
 (setq backup-by-copying t
@@ -128,13 +131,26 @@
            (lambda ()
              (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))))
 
+;;; ** auctex
+;;set xetex mode in tex/latex
+(add-hook 'LaTeX-mode-hook
+	  (lambda()
+	    (add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex%(mode)%' %t" TeX-run-TeX nil t))
+	    (setq TeX-command-default "XeLaTeX")
+	    (setq TeX-save-query nil)
+	    (setq TeX-show-compilation t)
+	    ))
+(setq LaTeX-item-indent 0)
+(setq TeX-newline-function 'newline-and-indent)
+
 ;;; ** perl
 
 ;; append perlbrew path to environment variable
 (setenv "PATH"
-	(concat "~/.pb/perls/perl-5.16-thread/bin:~/zion/go/bin:~/zion/letsgo/bin:/usr/local/bin:" 
+	(concat "~/zion/go/bin:~/zion/letsgo/bin:/usr/local/bin:" 
 		(getenv "PATH")))
 (setenv "PATH" (concat "~/zion/racket/racket/bin:" (getenv "PATH")))
+(setenv "PATH" (concat "/Library/Tex/texbin:" (getenv "PATH")))
 (setq exec-path (split-string (getenv "PATH") ":"))
 
 ;;; ** ELPA
@@ -152,6 +168,9 @@
 ;;; ** evil
 (require 'evil)
 (evil-mode 1)
+(define-key evil-normal-state-map "\C-b" 'ido-switch-buffer)
+(define-key evil-insert-state-map "\C-b" 'ido-switch-buffer)
+(define-key evil-visual-state-map "\C-b" 'ido-switch-buffer)
 ;; (add-hook 'evil-after-load-hook
 ;;          (lambda ()
 ;;          ;; config
@@ -289,59 +308,62 @@
 ;; (defface my-powerline-active1 '((t (:foreground "0D6E0E" :background "OliveDrab2" :inherit mode-line))) :group 'powerline)
 
 
-;; (defun powerline-my-theme ()
-;;   "Setup the default mode-line."
-;;   (interactive)
-;;   (setq-default mode-line-format
-;;                 '("%e"
-;;                   (:eval
-;;                    (let* ((active (powerline-selected-window-active))
-;;                           (mode-line (if active 'mode-line 'mode-line-inactive))
-;;                           (face1 (if active 'powerline-active1 'powerline-inactive1))
-;;                           (face2 (if active 'powerline-active2 'powerline-inactive2))
-;;                           (separator-left (intern (format "powerline-%s-%s"
-;; 							  'nil
-;;                                                           (car powerline-default-separator-dir))))
-;;                           (separator-right (intern (format "powerline-%s-%s"
-;;                                                            'nil
-;;                                                            (cdr powerline-default-separator-dir))))
-;;                           (lhs (list (powerline-raw "%*" nil 'l)
-;;                                      (when powerline-display-buffer-size
-;;                                        (powerline-buffer-size nil 'l))
-;;                                      (when powerline-display-mule-info
-;;                                        (powerline-raw mode-line-mule-info nil 'l))
-;;                                      (powerline-buffer-id nil 'l)
-;;                                      (when (and (boundp 'which-func-mode) which-func-mode)
-;;                                        (powerline-raw which-func-format nil 'l))
-;;                                      (powerline-raw " ")
-;;                                      (funcall separator-left mode-line face1)
-;;                                      (when (boundp 'erc-modified-channels-object)
-;;                                        (powerline-raw erc-modified-channels-object face1 'l))
-;;                                      (powerline-major-mode face1 'l)
-;;                                      (powerline-process face1)
-;;                                      (powerline-minor-modes face1 'l)
-;;                                      (powerline-narrow face1 'l)
-;;                                      (powerline-raw " " face1)
-;;                                      (funcall separator-left face1 face2)
-;;                                      (powerline-vc face2 'r)
-;;                                      (when (bound-and-true-p nyan-mode)
-;;                                        (powerline-raw (list (nyan-create)) face2 'l))))
-;;                           (rhs (list (powerline-raw global-mode-string face2 'r)
-;;                                      (funcall separator-right face2 face1)
-;; 				     (unless window-system
-;; 				       (powerline-raw (char-to-string #xe0a1) face1 'l))
-;; 				     (powerline-raw "%4l" face1 'l)
-;; 				     (powerline-raw ":" face1 'l)
-;; 				     (powerline-raw "%3c" face1 'r)
-;; 				     (funcall separator-right face1 mode-line)
-;; 				     (powerline-raw " ")
-;; 				     (powerline-raw "%6p" nil 'r)
-;;                                      (when powerline-display-hud
-;;                                        (powerline-hud face2 face1)))))
-;; 		     (concat (powerline-render lhs)
-;; 			     (powerline-fill face2 (powerline-width rhs))
-;; 			     (powerline-render rhs)))))))
-;; (powerline-my-theme)
+(defun powerline-my-theme ()
+  "Setup the default mode-line."
+  (interactive)
+  (setq-default mode-line-format
+                '("%e"
+                  (:eval
+                   (let* ((active (powerline-selected-window-active))
+                          (mode-line (if active 'mode-line 'mode-line-inactive))
+                          (face1 (if active 'powerline-active1 'powerline-inactive1))
+                          (face2 (if active 'powerline-active2 'powerline-inactive2))
+                          (separator-left (intern (format "powerline-%s-%s"
+							  'nil
+                                                          (car powerline-default-separator-dir))))
+                          (separator-right (intern (format "powerline-%s-%s"
+                                                           'nil
+                                                           (cdr powerline-default-separator-dir))))
+                          (lhs (list (powerline-raw "%*" nil 'l)
+                                     (when powerline-display-buffer-size
+                                       (powerline-buffer-size nil 'l))
+                                     (when powerline-display-mule-info
+                                       (powerline-raw mode-line-mule-info nil 'l))
+                                     (powerline-buffer-id nil 'l)
+                                     (when (and (boundp 'which-func-mode) which-func-mode)
+                                       (powerline-raw which-func-format nil 'l))
+                                     (powerline-raw " ")
+                                     (funcall separator-left mode-line face1)
+                                     (when (boundp 'erc-modified-channels-object)
+                                       (powerline-raw erc-modified-channels-object face1 'l))
+                                     (powerline-major-mode face1 'l)
+                                     (powerline-process face1)
+                                     (powerline-minor-modes face1 'l)
+                                     (powerline-narrow face1 'l)
+                                     (powerline-raw " " face1)
+                                     (funcall separator-left face1 face2)
+                                     (powerline-vc face2 'r)
+                                     (when (bound-and-true-p nyan-mode)
+                                       (powerline-raw (list (nyan-create)) face2 'l))))
+                          (rhs (list (powerline-raw global-mode-string face2 'r)
+                                     (funcall separator-right face2 face1)
+				     (unless window-system
+				       (powerline-raw (char-to-string #xe0a1) face1 'l))
+				     (powerline-raw "%4l" face1 'l)
+				     (powerline-raw ":" face1 'l)
+				     (powerline-raw "%3c" face1 'r)
+				     (funcall separator-right face1 mode-line)
+				     (powerline-raw " ")
+				     (powerline-raw "%6p" nil 'r)
+                                     (when powerline-display-hud
+                                       (powerline-hud face2 face1)))))
+		     (concat (powerline-render lhs)
+			     (powerline-fill face2 (powerline-width rhs))
+			     (powerline-render rhs)))))))
+(require 'powerline)
+;; (powerline-default-theme)
+(require 'powerline-evil)
+(powerline-default-theme)
 
 ;; hl-line-mode
 ;; (require 'hl-line)
@@ -368,6 +390,9 @@
 (add-hook 'ido-minibuffer-setup-hook 'ido-disable-line-truncation)
 (global-set-key (kbd "M-i") 'ido-goto-symbol)
 (global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
+(global-set-key (kbd "C-b") nil)
+(global-set-key (kbd "C-b") 'ido-switch-buffer)
+(global-set-key (kbd "s-b") 'ido-switch-buffer)
 ;; (global-set-key (kbd "C-x b") 'list-buffers)
 ;; (global-set-key (kbd "C-x C-b") 'list-buffers)
 ;; (global-set-key (kbd "C-x b") 'ido-switch-buffer)
@@ -635,7 +660,7 @@ instead."
 				 (ac-clang-launch-completion-process)
 				 )
 			       (defun ac-go-mode-setup ()
-				 (require 'go-autocomplete)
+				 ; (require 'go-autocomplete)
 				 (require 'auto-complete-config)
 				 (add-hook 'before-save-hook #'gofmt-before-save))
 
@@ -724,10 +749,13 @@ This is the same as using \\[set-mark-command] with the prefix argument."
  ;; If there is more than one, they won't work right.
  '(ansi-color-names-vector
    ["#272822" "#F92672" "#A6E22E" "#E6DB74" "#66D9EF" "#FD5FF0" "#A1EFE4" "#F8F8F2"])
+ '(blink-cursor-mode nil)
+ '(column-number-mode t)
  '(compilation-message-face (quote default))
  '(custom-safe-themes
    (quote
     ("64581032564feda2b5f2cf389018b4b9906d98293d84d84142d90d7986032d33" "60f04e478dedc16397353fb9f33f0d895ea3dab4f581307fbf0aa2f07e658a40" "ea0c5df0f067d2e3c0f048c1f8795af7b873f5014837feb0a7c8317f34417b04" default)))
+ '(display-time-mode t)
  '(fci-rule-color "#49483E")
  '(fill-column 80)
  '(helm-split-window-in-side-p t)
@@ -759,6 +787,10 @@ This is the same as using \\[set-mark-command] with the prefix argument."
   %a"))))
  '(org-default-notes-file "~/Notes/todo.org")
  '(org-directory "~/Notes")
+ '(package-selected-packages
+   (quote
+    (zencoding-mode zen-mode xclip web sml-mode slime-fuzzy quack powerline-evil nrepl monokai-theme markdown-mode magit lua-mode leuven-theme key-chord htmlize helm-ag go-mode go-autocomplete gnuplot-mode github-theme git-rebase-mode git-commit-mode ggtags geiser flymake-go flymake fic-ext-mode evil-nerd-commenter evil-leader evil-easymotion ess ergoemacs-mode cyberpunk-theme cssh cperl-mode company cmake-mode bookmark+ auto-complete-auctex auctex ascope ag ace-jump-mode ac-clang)))
+ '(show-paren-mode t)
  '(split-height-threshold 120)
  '(syslog-debug-face
    (quote
@@ -775,6 +807,7 @@ This is the same as using \\[set-mark-command] with the prefix argument."
  '(syslog-warn-face
    (quote
     ((t :background unspecified :foreground "#FD971F" :weight bold))))
+ '(tool-bar-mode nil)
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
    (quote
