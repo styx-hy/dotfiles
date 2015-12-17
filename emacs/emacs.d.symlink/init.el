@@ -156,7 +156,7 @@
 ;;; ** ELPA
 
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-			 ("marmalade" . "http://marmalade-repo.org/packages/")
+			 ;; ("marmalade" . "http://marmalade-repo.org/packages/")
 			 ("melpa" . "http://melpa.org/packages/")
 			 ("org" . "http://orgmode.org/elpa/")))
 
@@ -1076,7 +1076,9 @@ unwanted space when exporting org-mode to html."
 	    (setq-local linum-format-string
 			(let ((w (length (number-to-string
 					  (count-lines (point-min) (point-max))))))
-			  (concat " %" (number-to-string w) "d")))))
+			  (if window-system
+			      (concat " %" (number-to-string w) "d")
+			    (concat " %" (number-to-string w) "d "))))))
 
 (defun linum-format-func (line)
   (concat
