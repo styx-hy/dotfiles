@@ -567,7 +567,7 @@ instead."
 (define-key yas-minor-mode-map (kbd "C-c ; u") 'yas-expand)
 (defadvice yas/insert-snippet (around use-completing-prompt activate)
   "Use `yas/completing-prompt' for `yas/prompt-functions' but only here..."
-  (let ((yas/prompt-functions '(yas/completing-prompt)))
+  (let ((yas-prompt-functions '(yas/completing-prompt)))
     ad-do-it))
 (add-hook 'c-mode-hook
 	  (lambda ()
@@ -973,21 +973,29 @@ unwanted space when exporting org-mode to html."
   ;; because the buffer is closed by `org-publish-org-sitemap'
   ;; so I have to open it again
   (with-current-buffer
-      (let* ((project-plist (cdr project))
-	     (dir (file-name-as-directory
-		   (plist-get project-plist :base-directory)))
-	     (sitemap-filename (concat dir (or sitemap-filename "sitemap.org"))))
-      	(setq sitemap-buffer
-	      (find-file sitemap-filename)))
+      ;; (let* ((project-plist (cdr project))
+      ;; 	     (dir (file-name-as-directory
+      ;; 		   (plist-get project-plist :base-directory)))
+      ;; 	     (sitemap-filename (concat dir (or sitemap-filename "sitemap.org"))))
+      ;; 	(setq sitemap-buffer
+      ;; 	      (find-file sitemap-filename)))
+
     ;; move cursor to beginning of buffer
-    (beginning-of-buffer)
+    ;; (beginning-of-buffer)
+    (goto-char (point-min))
     ;; search for index and delete it
     (while (search-forward-regexp "^.*\\(index\\|about\\|header\\).*\n" nil t)
       (replace-match "" t t))
 
     ;; move date to a span outside anchor
-    (beginning-of-buffer)
-    (replace-regexp " \\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\)\\]\\]" "]]
+    ;; (beginning-of-buffer)
+    (goto-char (point-min))
+    ;; (re-search-forward " \\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\)\\]\\]" "]]
+    ;;  #+BEGIN_HTML
+    ;;    <span class=\"timestamp\">\\1</span>
+    ;;  #+END_HTML")
+    (re-search-forward " \\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\)\\]\\]")
+    (replace-match "]]
      #+BEGIN_HTML
        <span class=\"timestamp\">\\1</span>
      #+END_HTML")
