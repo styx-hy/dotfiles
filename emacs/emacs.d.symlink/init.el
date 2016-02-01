@@ -42,7 +42,9 @@
 (if (eq system-type 'darwin)
     (progn
       (set-face-attribute 'default nil :family "Inconsolata")
-      (set-face-attribute 'default nil :height 160)
+      (if (< (display-pixel-width) 2560)
+	  (set-face-attribute 'default nil :height 140)
+	(set-face-attribute 'default nil :height 160))
       (set-face-attribute 'default nil :weight 'medium)
       (set-face-attribute 'default nil :box nil)
       (dolist (charset '(kana han symbol cjk-misc bopomofo))
