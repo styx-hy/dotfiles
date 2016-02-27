@@ -170,9 +170,6 @@
 ;;; ** evil
 (require 'evil)
 (evil-mode 1)
-(define-key evil-normal-state-map "\C-b" 'ido-switch-buffer)
-(define-key evil-insert-state-map "\C-b" 'ido-switch-buffer)
-(define-key evil-visual-state-map "\C-b" 'ido-switch-buffer)
 ;; (add-hook 'evil-after-load-hook
 ;;          (lambda ()
 ;;          ;; config
