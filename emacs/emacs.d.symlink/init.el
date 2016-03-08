@@ -119,6 +119,12 @@
 ;; desktop
 (desktop-save-mode t)
 
+;;; ** ELPA
+
+(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+			 ;; ("marmalade" . "http://marmalade-repo.org/packages/")
+			 ("melpa" . "http://melpa.org/packages/")
+			 ("org" . "http://orgmode.org/elpa/")))
 ;;; * Packages
 
 (package-initialize)
@@ -136,15 +142,23 @@
 
 ;;; ** auctex
 ;;set xetex mode in tex/latex
-(add-hook 'LaTeX-mode-hook
-	  (lambda()
-	    (add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex%(mode)%' %t" TeX-run-TeX nil t))
-	    (setq TeX-command-default "XeLaTeX")
-	    (setq TeX-save-query nil)
-	    (setq TeX-show-compilation t)
-	    ))
-(setq LaTeX-item-indent 0)
-(setq TeX-newline-function 'newline-and-indent)
+(use-package auctex
+  :ensure t
+  :mode ("\\.tex\\'" . latex-mode)
+  :commands (latex-mode LaTex-mode plain-tex-mode)
+  :init
+  (add-hook 'LaTeX-mode-hook
+	    (lambda()
+	      (add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex%(mode)%' %t" TeX-run-TeX nil t))
+	      (setq TeX-command-default "XeLaTeX")
+	      (setq TeX-save-query nil)
+	      (setq TeX-show-compilation t)))
+  (add-hook 'LaTeX-mode-hook #'turn-on-reftex)
+  (setq TeX-auto-save t
+	TeX-PDF-mode t
+	LaTeX-item-indent 0
+	TeX-newline-function 'newline-and-indent)
+  (setq-default TeX-master nil))
 
 ;;; ** perl
 
@@ -155,13 +169,6 @@
 (setenv "PATH" (concat "~/zion/racket/racket/bin:" (getenv "PATH")))
 (setenv "PATH" (concat "/Library/Tex/texbin:" (getenv "PATH")))
 (setq exec-path (split-string (getenv "PATH") ":"))
-
-;;; ** ELPA
-
-(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-			 ;; ("marmalade" . "http://marmalade-repo.org/packages/")
-			 ("melpa" . "http://melpa.org/packages/")
-			 ("org" . "http://orgmode.org/elpa/")))
 
 ;;; ** evil-leader
 ;; should set before enable evil-mode
@@ -892,6 +899,11 @@ This is the same as using \\[set-mark-command] with the prefix argument."
 ;; (add-to-list 'org-latex-packages-alist '("" "color"))
 
 ;; reftex settings
+(use-package reftex
+  :commands turn-on-reftex
+  :init
+  (setq reftex-plug-into-AUCTeX t))
+
 (defun org-mode-reftex-setup ()
   ;; (load-library "reftex")
   (require 'reftex)
