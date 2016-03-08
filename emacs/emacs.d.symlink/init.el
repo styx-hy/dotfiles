@@ -50,7 +50,7 @@
       (dolist (charset '(kana han symbol cjk-misc bopomofo))
 	;; (set-fontset-font (frame-parameter nil 'font)
 	(set-fontset-font t charset (font-spec :family "PingFang SC" :size 14))))
-   ;; (set-face-attribute 'default nil :family "DejaVu Sans Mono" :height 130)
+  ;; (set-face-attribute 'default nil :family "DejaVu Sans Mono" :height 130)
   (add-to-list 'default-frame-alist
 	       '(font . "Monaco-12")))
 
@@ -79,11 +79,11 @@
       (sit-for blink-matching-delay))))
 (global-set-key [remap kill-ring-save] 'my-kill-ring-save)
 
-(put 'kill-region 'interactive-form      
+(put 'kill-region 'interactive-form
      '(interactive
        (if (use-region-p)
-           (list (region-beginning) (region-end))
-         (list (line-beginning-position) (line-beginning-position 2)))))
+	   (list (region-beginning) (region-end))
+	 (list (line-beginning-position) (line-beginning-position 2)))))
 
 ;; open large files
 (defun my-find-file-check-make-large-file-read-only-hook ()
@@ -122,6 +122,7 @@
 ;;; * Packages
 
 (package-initialize)
+(require 'use-package)
 
 ;;; ** ag
 (setq ag-highlight-search t)
@@ -129,9 +130,9 @@
 (global-set-key [f2] 'ag-project)
 ;;; ** ansi-term
 (add-hook 'term-exec-hook
-          (function
-           (lambda ()
-             (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))))
+	  (function
+	   (lambda ()
+	     (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))))
 
 ;;; ** auctex
 ;;set xetex mode in tex/latex
@@ -149,7 +150,7 @@
 
 ;; append perlbrew path to environment variable
 (setenv "PATH"
-	(concat "~/zion/go/bin:~/zion/letsgo/bin:/usr/local/bin:" 
+	(concat "~/zion/go/bin:~/zion/letsgo/bin:/usr/local/bin:"
 		(getenv "PATH")))
 (setenv "PATH" (concat "~/zion/racket/racket/bin:" (getenv "PATH")))
 (setenv "PATH" (concat "/Library/Tex/texbin:" (getenv "PATH")))
@@ -164,12 +165,27 @@
 
 ;;; ** evil-leader
 ;; should set before enable evil-mode
-(global-evil-leader-mode)
-(evil-leader/set-leader ",")
+;; Vim key bindings
+(use-package evil-leader
+  :ensure t
+  :config
+  (evil-leader/set-leader ",")
+  (evil-leader/set-key
+    "ci" 'evilnc-comment-or-uncomment-lines
+    "cl" 'evilnc-quick-comment-or-uncomment-to-the-line
+    "ll" 'evilnc-quick-comment-or-uncomment-to-the-line
+    "cc" 'evilnc-copy-and-comment-lines
+    "cp" 'evilnc-comment-or-uncomment-paragraphs
+    "cr" 'comment-or-uncomment-region
+    "cv" 'evilnc-toggle-invert-comment-line-by-line
+    "\\" 'evilnc-comment-operator) ; if you prefer backslash key
+  (global-evil-leader-mode))
 
 ;;; ** evil
-(require 'evil)
-(evil-mode 1)
+(use-package evil
+  :ensure t
+  :config
+  (evil-mode 1))
 ;; (add-hook 'evil-after-load-hook
 ;;          (lambda ()
 ;;          ;; config
@@ -178,16 +194,16 @@
 ;; change color in different state
 (require 'cl)
 (lexical-let ((default-color (cons (face-background 'mode-line)
-                                      (face-foreground 'mode-line))))
-     (add-hook 'post-command-hook
-       (lambda ()
-         (let ((color (cond ((minibufferp) default-color)
-                            ((evil-insert-state-p) '("#e80000" . "#ffffff"))
-                            ((evil-emacs-state-p)  '("#444488" . "#ffffff"))
-                            ((buffer-modified-p)   '("#006fa0" . "#ffffff"))
-                            (t default-color))))
-           (set-face-background 'mode-line (car color))
-           (set-face-foreground 'mode-line (cdr color))))))
+				   (face-foreground 'mode-line))))
+  (add-hook 'post-command-hook
+	    (lambda ()
+	      (let ((color (cond ((minibufferp) default-color)
+				 ((evil-insert-state-p) '("#e80000" . "#ffffff"))
+				 ((evil-emacs-state-p)  '("#444488" . "#ffffff"))
+				 ((buffer-modified-p)   '("#006fa0" . "#ffffff"))
+				 (t default-color))))
+		(set-face-background 'mode-line (car color))
+		(set-face-foreground 'mode-line (cdr color))))))
 
 ;;; ** evil-easymotion
 (evilem-default-keybindings ",")
@@ -198,31 +214,25 @@
 (global-set-key (kbd "C-c c") 'evilnc-copy-and-comment-lines)
 (global-set-key (kbd "C-c p") 'evilnc-comment-or-uncomment-paragraphs)
 
-;; Vim key bindings
-(require 'evil-leader)
-(global-evil-leader-mode)
-(evil-leader/set-key
-  "ci" 'evilnc-comment-or-uncomment-lines
-  "cl" 'evilnc-quick-comment-or-uncomment-to-the-line
-  "ll" 'evilnc-quick-comment-or-uncomment-to-the-line
-  "cc" 'evilnc-copy-and-comment-lines
-  "cp" 'evilnc-comment-or-uncomment-paragraphs
-  "cr" 'comment-or-uncomment-region
-  "cv" 'evilnc-toggle-invert-comment-line-by-line
-  "\\" 'evilnc-comment-operator ; if you prefer backslash key
-)
 ;;; ** key-chord
 ;; for mapping escape key in evil-mode
-(require 'key-chord)
-(setq key-chord-two-keys-delay 0.5)
-(key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
-(key-chord-mode 1)
+(use-package key-chord
+  :ensure t
+  :config
+  (setq key-chord-two-keys-delay 0.5)
+  (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
+  (key-chord-mode 1))
 
 ;;; ** Git
 
 ;; (add-to-list 'load-path "/usr/local/share/git-core/contrib/emacs")
 ;; (require 'git)
-(global-set-key (kbd "C-c i") 'magit-status) ; 'i' for info (of git repo)
+(use-package magit
+  :ensure t
+  ;; :commands (isearch-moccur isearch-all)
+  :commands magit-status
+  :bind
+  ("C-c i" . magit-status)) ; 'i' for info (of git repo)
 
 ;; ;; bookmark+
 ;; (add-to-list 'load-path "~/.emacs.d/elpa/bookmark+-20130317.1522")
@@ -233,9 +243,9 @@
 
 ;; (require 'gnus)
 ;; (setq gnus-select-method '(nnimap "gmail"
-;; 				  (nnimap-address "imap.gmail.com")   ; it could also be imap.googlemail.com if that's your server.
-;; 				  (nnimap-server-port 993)
-;; 				  (nnimap-stream ssl)))
+;;				  (nnimap-address "imap.gmail.com")   ; it could also be imap.googlemail.com if that's your server.
+;;				  (nnimap-server-port 993)
+;;				  (nnimap-stream ssl)))
 
 ;;; ** gocode
 
@@ -254,17 +264,17 @@
 ;; (setq company-echo-delay 0)                          ; removes annoying blinking
 ;; (setq company-begin-commands '(self-insert-command)) ; start autocompletion only after typing
 ;; (add-hook 'after-init-hook (lambda ()
-;; 			     (progn
-;; 			       (require 'company-clang)
-;; 			       (add-hook 'go-mode-hook (lambda ()
-;; 							 (progn
-;; 							   (require 'company) ; load company mode
-;; 							   (require 'company-go) ; load company mode go backend
-;; 							   (set (make-local-variable 'company-backends) '(company-go))
-;; 							   (company-mode))))
-;; 			       (add-hook 'c-mode-hook (lambda ()
-;; 							(company-mode)
-;; 							)))))
+;;			     (progn
+;;			       (require 'company-clang)
+;;			       (add-hook 'go-mode-hook (lambda ()
+;;							 (progn
+;;							   (require 'company) ; load company mode
+;;							   (require 'company-go) ; load company mode go backend
+;;							   (set (make-local-variable 'company-backends) '(company-go))
+;;							   (company-mode))))
+;;			       (add-hook 'c-mode-hook (lambda ()
+;;							(company-mode)
+;;							)))))
 ;; (setq geiser-company--completions t)
 
 ;; (custom-set-faces
@@ -295,15 +305,15 @@
 
 ;;; ** powerline
 ;; (add-hook 'after-init-hook
-;; 	  (lambda ()
-;; 	    (progn
-;; 	      (require 'powerline)
-;; 	      (when window-system
-;; 		(progn
-;; 		(set-face-attribute 'mode-line nil
-;; 				    ;; :background "OliveDrab2"
-;; 				    ))
-;; 		))))
+;;	  (lambda ()
+;;	    (progn
+;;	      (require 'powerline)
+;;	      (when window-system
+;;		(progn
+;;		(set-face-attribute 'mode-line nil
+;;				    ;; :background "OliveDrab2"
+;;				    ))
+;;		))))
 ;; (defface my-powerline-active1 '((t (:foreground "0D6E0E" :background "OliveDrab2" :inherit mode-line))) :group 'powerline)
 
 
@@ -319,7 +329,7 @@
 ;;; ** quack
 ;; The binary of your interpreter
 (setq scheme-program-name "racket")
- 
+
 ;; This hook lets you use your theme colours instead of quack's ones.
 ;; (defun scheme-mode-quack-hook ()
 ;;   (require 'quack)
@@ -348,7 +358,7 @@
   "Refresh imenu and jump to a place in the buffer using Ido."
   (interactive)
   (unless (featurep 'imenu)
-	  (require 'imenu nil t))
+    (require 'imenu nil t))
   (cond
    ((not symbol-list)
     (let ((ido-mode ido-mode)
@@ -358,19 +368,19 @@
 	  ;; N.B. `let' syntax, symbol solely will be bould to nil
 	  name-and-pos symbol-names position)
       (unless ido-mode
-	      (ido-mode 1)
-	      (setq ido-enable-flex-matching t))
+	(ido-mode 1)
+	(setq ido-enable-flex-matching t))
       (while (progn
 	       ;; this is "repeat...until" mode of while loop
 	       ;; the last statement will act as the end-test
-	      (imenu--cleanup)
-	      (setq imenu--index-alist nil)
-	      (ido-goto-symbol (imenu--make-index-alist)) ; generate the symbols
-	      (setq selected-symbol
-		    (ido-completing-read "Symbol: " symbol-names))
-	      (string= (car imenu--rescan-item) selected-symbol)))
+	       (imenu--cleanup)
+	       (setq imenu--index-alist nil)
+	       (ido-goto-symbol (imenu--make-index-alist)) ; generate the symbols
+	       (setq selected-symbol
+		     (ido-completing-read "Symbol: " symbol-names))
+	       (string= (car imenu--rescan-item) selected-symbol)))
       (unless (and (boundp 'mark-active) mark-active)
-	      (push-mark nil t nil))
+	(push-mark nil t nil))
       (setq position (cdr (assoc selected-symbol name-and-pos)))
       (cond
        ((overlayp position)
@@ -379,21 +389,21 @@
 	(goto-char position)))))
    ((listp symbol-list)
     (dolist (symbol symbol-list)
-	    (let (name position)
-	      (cond
-	       ((and (listp symbol) (imenu--subalist-p symbol))
-		(ido-goto-symbol symbol))
-	       ((listp symbol)
-		(setq name (car symbol))
-		(setq position (cdr symbol)))
-	       ((stringp symbol)
-		(setq name symbol)
-		(setq position
-		      (get-text-property 1 'org-imenu-marker symbol))))
-	      (unless (or (null position) (null name) ;; test if variable is still nil
-			  (string= (car imenu--rescan-item) name))
-		      (add-to-list 'symbol-names name)
-		      (add-to-list 'name-and-pos (cons name position))))))))
+      (let (name position)
+	(cond
+	 ((and (listp symbol) (imenu--subalist-p symbol))
+	  (ido-goto-symbol symbol))
+	 ((listp symbol)
+	  (setq name (car symbol))
+	  (setq position (cdr symbol)))
+	 ((stringp symbol)
+	  (setq name symbol)
+	  (setq position
+		(get-text-property 1 'org-imenu-marker symbol))))
+	(unless (or (null position) (null name) ;; test if variable is still nil
+		    (string= (car imenu--rescan-item) name))
+	  (add-to-list 'symbol-names name)
+	  (add-to-list 'name-and-pos (cons name position))))))))
 
 (defvar smart-use-extended-syntax nil
   "If t the smart symbol functionality will consider extended
@@ -420,23 +430,23 @@ is valid."
   ;; `smart-symbol-go-forward/backward' then we assume it's a
   ;; brand-new command and we re-set the search term.
   (unless (memq last-command '(smart-symbol-go-forward
-                               smart-symbol-go-backward))
+			       smart-symbol-go-backward))
     (setq smart-last-symbol-name name))
   (setq smart-symbol-old-pt (point))
   (message (format "%s scan for symbol \"%s\""
-                   (capitalize (symbol-name direction))
-                   smart-last-symbol-name))
+		   (capitalize (symbol-name direction))
+		   smart-last-symbol-name))
   (unless (catch 'done
-            (while (funcall (cond
-                             ((eq direction 'forward) ; forward
-                              'search-forward)
-                             ((eq direction 'backward) ; backward
-                              'search-backward)
-                             (t (error "Invalid direction"))) ; all others
-                            smart-last-symbol-name nil t)
-              (unless (memq (syntax-ppss-context
-                             (syntax-ppss (point))) '(string comment))
-                (throw 'done t))))
+	    (while (funcall (cond
+			     ((eq direction 'forward) ; forward
+			      'search-forward)
+			     ((eq direction 'backward) ; backward
+			      'search-backward)
+			     (t (error "Invalid direction"))) ; all others
+			    smart-last-symbol-name nil t)
+	      (unless (memq (syntax-ppss-context
+			     (syntax-ppss (point))) '(string comment))
+		(throw 'done t))))
     (goto-char smart-symbol-old-pt)))
 
 (defun smart-symbol-go-forward ()
@@ -456,20 +466,20 @@ If `smart-use-extended-syntax' is t then that symbol is returned
 instead."
   (with-syntax-table (make-syntax-table)
     (if smart-use-extended-syntax
-        (modify-syntax-entry ?. "w"))
+	(modify-syntax-entry ?. "w"))
     (modify-syntax-entry ?_ "w")
     (modify-syntax-entry ?- "w")
     ;; grab the word and return it
     (let ((word (thing-at-point 'word))
-          (bounds (bounds-of-thing-at-point 'word)))
+	  (bounds (bounds-of-thing-at-point 'word)))
       (if word
-          (progn
-            (cond
-             ((eq dir 'beginning) (goto-char (car bounds)))
-             ((eq dir 'end) (goto-char (cdr bounds)))
-             (t (error "Invalid direction")))
-            word)
-        (error "No symbol found")))))
+	  (progn
+	    (cond
+	     ((eq dir 'beginning) (goto-char (car bounds)))
+	     ((eq dir 'end) (goto-char (cdr bounds)))
+	     (t (error "Invalid direction")))
+	    word)
+	(error "No symbol found")))))
 
 (global-set-key (kbd "M-n") 'smart-symbol-go-forward)
 (global-set-key (kbd "M-p") 'smart-symbol-go-backward)
@@ -488,13 +498,13 @@ instead."
 ;; (setq sr-speedbar-width-x 16)
 ;; (setq sr-speedbar-skip-other-window-p t)
 ;; (setq speedbar-frame-parameters (quote
-;; 				 ((minibuffer)
-;; 				  (width . 20)
-;; 				  (border-width . 0)
-;; 				  (menu-bar-lines . 0)
-;; 				  (tool-bar-lines . 0)
-;; 				  (unsplittable . t)
-;; 				  (left-fringe . 0))))
+;;				 ((minibuffer)
+;;				  (width . 20)
+;;				  (border-width . 0)
+;;				  (menu-bar-lines . 0)
+;;				  (tool-bar-lines . 0)
+;;				  (unsplittable . t)
+;;				  (left-fringe . 0))))
 ;; (sr-speedbar-open);
 
 
@@ -504,46 +514,54 @@ instead."
 
 ;;; ** yasnippet
 
-(add-to-list 'load-path "~/.emacs.d/yasnippet")
-(require 'yasnippet)
-
-;; first unbind the tab from auto expand
-;; (define-key yas-minor-mode-map (kbd "TAB") nil)
-;; (define-key yas-minor-mode-map [(tab)] nil)
-(define-key yas-minor-mode-map (kbd "C-c ; u") 'yas-expand)
-(defadvice yas/insert-snippet (around use-completing-prompt activate)
-  "Use `yas/completing-prompt' for `yas/prompt-functions' but only here..."
-  (let ((yas-prompt-functions '(yas/completing-prompt)))
-    ad-do-it))
-(add-hook 'c-mode-hook
-	  (lambda ()
-	    (yas-minor-mode)))
-;; (yas-global-mode 1)
-(defun yas-ido-expand ()
-  "Lets you select (and expand) a yasnippet key"
-  (interactive)
+(use-package yasnippet
+  :ensure t
+  :no-require t
+  :defines yas-minor-mode-map
+  :preface
+  (defadvice yas/insert-snippet (around use-completing-prompt activate)
+    "Use `yas/completing-prompt' for `yas/prompt-functions' but only here..."
+    (let ((yas-prompt-functions '(yas/completing-prompt)))
+      ad-do-it))
+  (defun yas-ido-expand ()
+    "Lets you select (and expand) a yasnippet key"
+    (interactive)
     (let ((original-point (point)))
       (while (and
-              (not (= (point) (point-min) ))
-              (not
-               (string-match "[[:space:]\n]" (char-to-string (char-before)))))
-        (backward-word 1))
-    (let* ((init-word (point))
-           (word (buffer-substring init-word original-point))
-           (list (yas-active-keys)))
-      (goto-char original-point)
-      (let ((key (remove-if-not
-                  (lambda (s) (string-match (concat "^" word) s)) list)))
-        (if (= (length key) 1)
-            (setq key (pop key))
-          (setq key (ido-completing-read "key: " list nil nil word)))
-        (delete-char (- init-word original-point))
-        (insert key)
-        (yas-expand)))))
-(define-key yas-minor-mode-map (kbd "<C-tab>") 'yas-ido-expand)
-(yas-reload-all)
+	      (not (= (point) (point-min) ))
+	      (not
+	       (string-match "[[:space:]\n]" (char-to-string (char-before)))))
+	(backward-word 1))
+      (let* ((init-word (point))
+	     (word (buffer-substring init-word original-point))
+	     (list (yas-active-keys)))
+	(goto-char original-point)
+	(let ((key (remove-if-not
+		    (lambda (s) (string-match (concat "^" word) s)) list)))
+	  (if (= (length key) 1)
+	      (setq key (pop key))
+	    (setq key (ido-completing-read "key: " list nil nil word)))
+	  (delete-char (- init-word original-point))
+	  (insert key)
+	  (yas-expand)))))
+  :bind-keymap
+  ;; XXX must be keymaps defined in the package instead of command functions
+  ;; first unbind the tab from auto expand
+  ;; (define-key yas-minor-mode-map (kbd "TAB") nil)
+  ;; (define-key yas-minor-mode-map [(tab)] nil)
+  ;; (yas-global-mode 1)
 
-(add-to-list 'yas-snippet-dirs "~/.emacs.d/yas-go")
+  ;; (:map yas-minor-mode-map
+  (("C-c ; u" . yas-expand)
+   ("<C-tab>" . yas-ido-expand))
+  :config
+  (add-hook 'c-mode-hook
+	    (lambda ()
+	      (yas-minor-mode)))
+  ;; (yas-reload-all)
+  )
+
+;; (add-to-list 'yas-snippet-dirs "~/.emacs.d/snippets")
 
 ;; (font-lock-add-keywords 'c-mode '(("\\(\\w+\\)\\s-*\(" . font-lock-function-name-face)))
 ;; (font-lock-add-keywords 'c-mode '(("if" . font-lock-keyword-face)))
@@ -551,27 +569,27 @@ instead."
 ;; (font-lock-add-keywords 'c-mode '(("while" . font-lock-keyword-face)))
 (global-font-lock-mode t)
 ;; (add-hook 'org-mode-hook
-;; 	  (lambda ()
-;; 	    (interactive)
-;; 	    ;; (variable-pitch-mode t)
-;; 	    (buffer-face-set '(:family "TeX Gyre Termes" :height 180))
-;; 	    (dolist (face '(org-block-begin-line
-;; 			    org-block-end-line
-;; 			    org-meta-line
-;; 			    org-verbatim
-;; 			    ;; org-block-background
-;; 			    ))
-;; 			  (set-face-attribute face nil :height 130 :inherit 'fixed-pitch))
-;; 	    ;; (buffer-face-mode)
-;; 	    ))
+;;	  (lambda ()
+;;	    (interactive)
+;;	    ;; (variable-pitch-mode t)
+;;	    (buffer-face-set '(:family "TeX Gyre Termes" :height 180))
+;;	    (dolist (face '(org-block-begin-line
+;;			    org-block-end-line
+;;			    org-meta-line
+;;			    org-verbatim
+;;			    ;; org-block-background
+;;			    ))
+;;			  (set-face-attribute face nil :height 130 :inherit 'fixed-pitch))
+;;	    ;; (buffer-face-mode)
+;;	    ))
 ;; (setq font-lock-defaults t)
 
 ;; (when (and (fboundp 'semantic-mode)
 ;;            (not (locate-library "semantic-ctxt"))) ; can't found offical cedet
 ;;       (setq semantic-default-submodes '(global-semantic-idle-scheduler-mode
-;; 					global-semanticdb-minor-mode
-;; 					global-semantic-idle-summary-mode
-;; 					global-semantic-mru-bookmark-mode)))
+;;					global-semanticdb-minor-mode
+;;					global-semantic-idle-summary-mode
+;;					global-semantic-mru-bookmark-mode)))
 ;; (semantic-mode 1)
 ;; (require 'semantic/ctxt)
 ;; (add-to-list 'load-path "~/.emacs.d/elpa/highlight-21.0")
@@ -596,7 +614,7 @@ instead."
 							ac-source-dictionary
 							ac-source-words-in-same-mode-buffers
 							))
-))
+			     ))
 
 (add-hook 'after-init-hook (lambda ()
 			     (progn
@@ -606,7 +624,7 @@ instead."
 				 (ac-clang-launch-completion-process)
 				 )
 			       (defun ac-go-mode-setup ()
-				 ; (require 'go-autocomplete)
+					; (require 'go-autocomplete)
 				 (require 'auto-complete-config)
 				 (add-hook 'before-save-hook #'gofmt-before-save))
 
@@ -651,7 +669,7 @@ instead."
   (x-send-client-message
    nil 0 nil "_NET_WM_STATE" 32
    '(2 "_NET_WM_STATE_FULLSCREEN" 0))
-)
+  )
 
 (defun push-mark-no-activate ()
   "Pushes `point' to `mark-ring' and does not activate the region
@@ -675,14 +693,14 @@ This is the same as using \\[set-mark-command] with the prefix argument."
 (require 'markdown-mode)
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 (add-hook 'markdown-mode-hook
-          (function
-           (lambda ()
-             (setq tab-width 4
+	  (function
+	   (lambda ()
+	     (setq tab-width 4
 		   indent-tabs-mode nil)
 	     )))
 (add-hook 'markdown-mode-hook
-          (function
-           (lambda ()
+	  (function
+	   (lambda ()
 	     (local-set-key (kbd "<tab>") 'markdown-insert-pre)
 	     )))
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
@@ -782,11 +800,11 @@ This is the same as using \\[set-mark-command] with the prefix argument."
 (global-set-key "\C-cn" 'org-capture)
 
 (setq org-todo-keywords
-       '((sequence "TODO(t)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)")))
+      '((sequence "TODO(t)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)")))
 (defun org-summary-todo (n-done n-not-done)
-       "Switch entry to DONE when all subentries are done, to TODO otherwise."
-       (let (org-log-done org-log-states)   ; turn off logging
-         (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+  "Switch entry to DONE when all subentries are done, to TODO otherwise."
+  (let (org-log-done org-log-states)   ; turn off logging
+    (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
 (add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
 
 (setq org-todo-done 'note)
@@ -833,9 +851,9 @@ This is the same as using \\[set-mark-command] with the prefix argument."
 	  (""     "latexsym"  t)
 	  (""     "amssymb"   t)
 	  (""     "hyperref"  nil)))
-  
+
   ;; Packages to include when xelatex is used
-  ;; (see https://github.com/kjhealy/latex-custom-kjh for the 
+  ;; (see https://github.com/kjhealy/latex-custom-kjh for the
   ;; non-standard ones.)
   (if (string-match "LATEX_CMD: xelatex" (buffer-string))
       (setq org-latex-default-packages-alist
@@ -852,7 +870,7 @@ This is the same as using \\[set-mark-command] with the prefix argument."
 	      ("" "soul" t)
 	      ("xetex, colorlinks=true, urlcolor=FireBrick, plainpages=false, pdfpagelabels, bookmarksnumbered" "hyperref" nil)
 	      )))
-  
+
   (if (string-match "LATEX_CMD: xelatex" (buffer-string))
       (setq org-latex-classes
 	    (cons '("article"
@@ -865,7 +883,7 @@ This is the same as using \\[set-mark-command] with the prefix argument."
 		    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
 		    ("\\paragraph{%s}" . "\\paragraph*{%s}")
 		    ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
-		  org-latex-classes))))  
+		  org-latex-classes))))
 
 (add-hook 'org-latex-after-initial-vars-hook 'my-auto-tex-parameters)
 
@@ -914,21 +932,21 @@ unwanted space when exporting org-mode to html."
     (ad-set-arg 1 fixed-contents)))
 
 (defadvice org-publish-org-sitemap
-  (after remove-index-from-sitemap (project &optional sitemap-filename) activate)
+    (after remove-index-from-sitemap (project &optional sitemap-filename) activate)
   ;; search backward because the default position is at the end
   ;; because the buffer is closed by `org-publish-org-sitemap'
   ;; so I have to open it again
   (with-current-buffer
       ;; (let* ((project-plist (cdr project))
-      ;; 	     (dir (file-name-as-directory
-      ;; 		   (plist-get project-plist :base-directory)))
-      ;; 	     (sitemap-filename (concat dir (or sitemap-filename "sitemap.org"))))
-      ;; 	(setq sitemap-buffer
-      ;; 	      (find-file sitemap-filename)))
+      ;;	     (dir (file-name-as-directory
+      ;;		   (plist-get project-plist :base-directory)))
+      ;;	     (sitemap-filename (concat dir (or sitemap-filename "sitemap.org"))))
+      ;;	(setq sitemap-buffer
+      ;;	      (find-file sitemap-filename)))
 
-    ;; move cursor to beginning of buffer
-    ;; (beginning-of-buffer)
-    (goto-char (point-min))
+      ;; move cursor to beginning of buffer
+      ;; (beginning-of-buffer)
+      (goto-char (point-min))
     ;; search for index and delete it
     (while (search-forward-regexp "^.*\\(index\\|about\\|header\\).*\n" nil t)
       (replace-match "" t t))
@@ -948,7 +966,7 @@ unwanted space when exporting org-mode to html."
     (save-buffer)))
 
 (defadvice org-html-template
-  (after org-html-disable-title-in-content (contents info) activate)
+    (after org-html-disable-title-in-content (contents info) activate)
   (if (string-equal (file-name-nondirectory buffer-file-name) "index.org")
       (setq ad-return-value
 	    (replace-regexp-in-string "<h1 class=\"title\">.*\n" "" ad-return-value))))
@@ -965,7 +983,7 @@ unwanted space when exporting org-mode to html."
 ;;   ;; (message filename)
 ;;   (if (string-equal (file-name-nondirectory filename) "sitemap.org")
 ;;       (org-html-publish-to-html (plist-put plist :body-only t)
-;; 				filename pub-dir)
+;;				filename pub-dir)
 ;;     (org-html-publish-to-html plist filename pub-dir)))
 
 (setq org-publish-project-alist
@@ -976,19 +994,19 @@ unwanted space when exporting org-mode to html."
 	 :publishing-directory "~/p/org-blog/"
 	 :recursive t
 	 :publishing-function org-html-publish-to-html
-         :headline-levels 4               ; Just the default for this project.
-         :auto-preamble nil
-         :auto-sitemap t                  ; Generate sitemap.org automagically...
-         :sitemap-filename "sitemap.org"  ; ... call it sitemap.org (it's the default)...
-         :sitemap-title ""                ; ... with title 'Sitemap'.
+	 :headline-levels 4               ; Just the default for this project.
+	 :auto-preamble nil
+	 :auto-sitemap t                  ; Generate sitemap.org automagically...
+	 :sitemap-filename "sitemap.org"  ; ... call it sitemap.org (it's the default)...
+	 :sitemap-title ""                ; ... with title 'Sitemap'.
 	 :sitemap-file-entry-format "%t %d"
 	 :sitemap-sort-files anti-chronologically
-         :export-creator-info nil    ; Disable the inclusion of "Created by Org" in the postamble.
-         :export-author-info nil     ; Disable the inclusion of "Author: Your Name" in the postamble.
-         :auto-postamble nil         ; Disable auto postamble 
-         :table-of-contents t        ; Set this to "t" if you want a table of contents, set to "nil" disables TOC.
-         :section-numbers nil        ; Set this to "t" if you want headings to have numbers.
-         ;; :html-postamble "    <p class=\"postamble\">Last Updated %d.</p> " ; your personal postamble
+	 :export-creator-info nil    ; Disable the inclusion of "Created by Org" in the postamble.
+	 :export-author-info nil     ; Disable the inclusion of "Author: Your Name" in the postamble.
+	 :auto-postamble nil         ; Disable auto postamble
+	 :table-of-contents t        ; Set this to "t" if you want a table of contents, set to "nil" disables TOC.
+	 :section-numbers nil        ; Set this to "t" if you want headings to have numbers.
+	 ;; :html-postamble "    <p class=\"postamble\">Last Updated %d.</p> " ; your personal postamble
 
 	 :html-preamble "<div class=\"header\">
 <div class=\"header-menu\">
@@ -1002,25 +1020,25 @@ unwanted space when exporting org-mode to html."
 "
 	 :html-postamble "<div id=\"disqus_thread\"></div>
     <script type=\"text/javascript\">
-        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-        var disqus_shortname = 'yanghong'; // required: replace example with your forum shortname
+	/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+	var disqus_shortname = 'yanghong'; // required: replace example with your forum shortname
 
-        /* * * DON'T EDIT BELOW THIS LINE * * */
-        (function() {
-            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-        })();
+	/* * * DON'T EDIT BELOW THIS LINE * * */
+	(function() {
+	    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	})();
     </script>
     <noscript>Please enable JavaScript to view the <a href=\"http://disqus.com/?ref_noscript\">comments powered by Disqus.</a></noscript>
     <a href=\"http://disqus.com\" class=\"dsq-brlink\">comments powered by <span class=\"logo-disqus\">Disqus</span></a>"
-         :html-head-include-default-style nil  ;Disable the default css style
+	 :html-head-include-default-style nil  ;Disable the default css style
 	 :html-head-include-scripts nil
 	 :html-html5-fancy t
 	 :html-doctype "html5"
 
-	 :with-toc nil 			; Disable table of contents
-)))
+	 :with-toc nil			; Disable table of contents
+	 )))
 
 ;;; ** linum-mode
 ;; (global-linum-mode 1)
@@ -1108,7 +1126,7 @@ unwanted space when exporting org-mode to html."
 			     (expand-file-name filename)))
       (setq comment-start "//"
 	    comment-end   "")
-      
+
       (c-set-offset 'arglist-intro
 		    'google-c-lineup-expression-plus-8)
       (c-set-offset 'arglist-cont-nonempty
@@ -1125,17 +1143,17 @@ unwanted space when exporting org-mode to html."
 		    '(c-lineup-gcc-asm-reg (c-lineup-argcont 8))))
     (when (and filename
 	       (or ;; (string-match "linux"
-		   ;; 	     (expand-file-name filename))
-      (setq indent-tabs-mode t)
-      (setq c-indentation-style "linux")
-      (setq c-basic-offset 8)
-      ;; (c-set-offset 'arglist-intro
-      ;; 		    'google-c-lineup-expression-plus-4)
-      (c-set-offset 'arglist-cont-nonempty 8)
-      		    ;; 'google-c-lineup-expression-plus-4)
-      ;; 		    '(c-lineup-gcc-asm-reg (c-lineup-argcont 0)))
-      ;; (c-set-offset 'statement-cont 8)
-      )))))
+		;;	     (expand-file-name filename))
+		(setq indent-tabs-mode t)
+		(setq c-indentation-style "linux")
+		(setq c-basic-offset 8)
+		;; (c-set-offset 'arglist-intro
+		;;		    'google-c-lineup-expression-plus-4)
+		(c-set-offset 'arglist-cont-nonempty 8)
+		;; 'google-c-lineup-expression-plus-4)
+		;;		    '(c-lineup-gcc-asm-reg (c-lineup-argcont 0)))
+		;; (c-set-offset 'statement-cont 8)
+		)))))
 
 (add-hook 'c-mode-hook 'my-c-style-hook)
 (add-hook 'c++-mode-hook 'my-c-style-hook)
@@ -1151,20 +1169,20 @@ unwanted space when exporting org-mode to html."
        c-basic-offset)))
 
 (add-hook 'c-mode-common-hook
-          (lambda ()
-            ;; Add kernel style
-            (c-add-style
-             "linux-tabs-only"
-             '("linux" (c-offsets-alist
-                        (arglist-cont-nonempty
-                         c-lineup-gcc-asm-reg
-                         c-lineup-arglist-tabs-only))))))
+	  (lambda ()
+	    ;; Add kernel style
+	    (c-add-style
+	     "linux-tabs-only"
+	     '("linux" (c-offsets-alist
+			(arglist-cont-nonempty
+			 c-lineup-gcc-asm-reg
+			 c-lineup-arglist-tabs-only))))))
 
 (add-hook 'c-mode-hook
-          (lambda ()
-            (let ((filename (buffer-file-name)))
-              ;; Enable kernel mode for the appropriate files
-              (when (and filename
+	  (lambda ()
+	    (let ((filename (buffer-file-name)))
+	      ;; Enable kernel mode for the appropriate files
+	      (when (and filename
 			 (or
 			  (string-match "linux"
 					(expand-file-name filename))
@@ -1174,8 +1192,8 @@ unwanted space when exporting org-mode to html."
 					(expand-file-name filename))
 			  (string-match "pkt-chan"
 					(expand-file-name filename))))
-                (setq indent-tabs-mode t)
-                (c-set-style "linux-tabs-only")))))
+		(setq indent-tabs-mode t)
+		(c-set-style "linux-tabs-only")))))
 
 ;; highlight fixme
 (add-hook 'tex-mode-hook
@@ -1186,17 +1204,17 @@ unwanted space when exporting org-mode to html."
 ;; (add-hook 'c-mode-common-hook 'google-make-newline-indent)
 
 ;; (add-hook 'c-mode-hook
-;; 	  '(lambda()
-;; 	     (c-set-style "k&r")
-;; 	     (setq c-basic-offset 4)
-;; 	     (setq indent-tabs-mode nil)))
+;;	  '(lambda()
+;;	     (c-set-style "k&r")
+;;	     (setq c-basic-offset 4)
+;;	     (setq indent-tabs-mode nil)))
 
 ;; (defun c-lineup-arglist-tabs-only (ignored)
 ;;   "Line up argument lists by tabs, not spaces"
 ;;   (let* ((anchor (c-langelem-pos c-syntactic-element))
-;; 	 (column (c-langelem-2nd-pos c-syntactic-element))
-;; 	 (offset (- (1+ column) anchor))
-;; 	 (steps (floor offset c-basic-offset)))
+;;	 (column (c-langelem-2nd-pos c-syntactic-element))
+;;	 (offset (- (1+ column) anchor))
+;;	 (steps (floor offset c-basic-offset)))
 ;;     (* (max steps 1)
 ;;        c-basic-offset)))
 
@@ -1218,11 +1236,11 @@ unwanted space when exporting org-mode to html."
     (server-start)))
 
 (add-hook 'server-switch-hook
-        (lambda ()
-          (when (current-local-map)
-            (use-local-map (copy-keymap (current-local-map))))
-            (when server-buffer-clients
-              (local-set-key (kbd "C-x j") 'server-edit))))
+	  (lambda ()
+	    (when (current-local-map)
+	      (use-local-map (copy-keymap (current-local-map))))
+	    (when server-buffer-clients
+	      (local-set-key (kbd "C-x j") 'server-edit))))
 
 ;; test existence and state of server
 ;; (and (boundp 'server-process)
@@ -1257,55 +1275,54 @@ unwanted space when exporting org-mode to html."
 ;; (load-theme 'molokai t)
 ;; (toggle-indicate-empty-lines nil)
 ;; (setq-default mode-line-format
-;; 	      (list
-;; 	       ;; the buffer name; the file name as a tool tip
-;; 	       '(:eval (propertize "%b " 'face 'font-lock-keyword-face 'help-echo (buffer-file-name)))
+;;	      (list
+;;	       ;; the buffer name; the file name as a tool tip
+;;	       '(:eval (propertize "%b " 'face 'font-lock-keyword-face 'help-echo (buffer-file-name)))
 
-;; 	       ;; line and column
-;; 	       "(" (propertize "%4l" 'face 'font-lock-type-face) "," (propertize "%4c" 'face 'font-lock-type-face) ") "
-;; 	       '(:eval (propertize "%4l" 'face 'font-lock-type-face) (-3 "%4l"))
+;;	       ;; line and column
+;;	       "(" (propertize "%4l" 'face 'font-lock-type-face) "," (propertize "%4c" 'face 'font-lock-type-face) ") "
+;;	       '(:eval (propertize "%4l" 'face 'font-lock-type-face) (-3 "%4l"))
 
-;; 	       ;; relative position, size of file
-;; 	       "[" (propertize "%p" 'face 'font-lock-constant-face) "/" (propertize "%I" 'face 'font-lock-constant-face) "] "
+;;	       ;; relative position, size of file
+;;	       "[" (propertize "%p" 'face 'font-lock-constant-face) "/" (propertize "%I" 'face 'font-lock-constant-face) "] "
 
-;; 	       ;; the current major mode for the buffer.
-;; 	       "[" '(:eval (propertize "%m" 'face 'font-lock-string-face 'help-echo buffer-file-coding-system)) "] "
+;;	       ;; the current major mode for the buffer.
+;;	       "[" '(:eval (propertize "%m" 'face 'font-lock-string-face 'help-echo buffer-file-coding-system)) "] "
 
 
-;; 	       "[" ;; insert vs overwrite mode, input-method in a tooltip
-;; 	       '(:eval (propertize (if overwrite-mode "Ovr" "Ins")
-;; 				   'face 'font-lock-preprocessor-face
-;; 				   'help-echo (concat "Buffer is in "
-;; 						      (if overwrite-mode "overwrite" "insert") " mode")))
+;;	       "[" ;; insert vs overwrite mode, input-method in a tooltip
+;;	       '(:eval (propertize (if overwrite-mode "Ovr" "Ins")
+;;				   'face 'font-lock-preprocessor-face
+;;				   'help-echo (concat "Buffer is in "
+;;						      (if overwrite-mode "overwrite" "insert") " mode")))
 
-;; 	       ;; was this buffer modified since the last save?
-;; 	       '(:eval (when (buffer-modified-p)
-;; 			 (concat ","  (propertize "Mod"
-;; 						  'face 'font-lock-warning-face
-;; 						  'help-echo "Buffer has been modified"))))
+;;	       ;; was this buffer modified since the last save?
+;;	       '(:eval (when (buffer-modified-p)
+;;			 (concat ","  (propertize "Mod"
+;;						  'face 'font-lock-warning-face
+;;						  'help-echo "Buffer has been modified"))))
 
-;; 	       ;; is this buffer read-only?
-;; 	       '(:eval (when buffer-read-only
-;; 			 (concat ","  (propertize "RO"
-;; 						  'face 'font-lock-type-face
-;; 						  'help-echo "Buffer is read-only"))))
-;; 	       "] "
+;;	       ;; is this buffer read-only?
+;;	       '(:eval (when buffer-read-only
+;;			 (concat ","  (propertize "RO"
+;;						  'face 'font-lock-type-face
+;;						  'help-echo "Buffer is read-only"))))
+;;	       "] "
 
-;; 	       ;; add the time, with the date and the emacs uptime in the tooltip
-;; 	       '(:eval (propertize (format-time-string "%H:%M")
-;; 				   'help-echo
-;; 				   (concat (format-time-string "%c; ")
-;; 					   (emacs-uptime "Uptime:%hh"))))
-;; 	       " --"
-;; 	       ;; i don't want to see minor-modes; but if you want, uncomment this:
-;; 	       ;; minor-mode-alist  ;; list of minor modes
-;; 	       "%-" ;; fill with '-'
-;; 	       ))
-;; (when window-system
-;;   (load-theme 'yamonokai t))
-;; (load-theme 'monokai t)
+;;	       ;; add the time, with the date and the emacs uptime in the tooltip
+;;	       '(:eval (propertize (format-time-string "%H:%M")
+;;				   'help-echo
+;;				   (concat (format-time-string "%c; ")
+;;					   (emacs-uptime "Uptime:%hh"))))
+;;	       " --"
+;;	       ;; i don't want to see minor-modes; but if you want, uncomment this:
+;;	       ;; minor-mode-alist  ;; list of minor modes
+;;	       "%-" ;; fill with '-'
+;;	       ))
 (when window-system
-  (load-theme 'leuven t))
+  ;;   (load-theme 'yamonokai t))
+  (load-theme 'monokai t))
+;; (load-theme 'leuven t))
 ;; (load-theme 'solarized-light t)
 
 (set-face-attribute 'mode-line nil :box nil)
