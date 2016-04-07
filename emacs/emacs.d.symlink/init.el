@@ -213,13 +213,19 @@
 		(set-face-foreground 'mode-line (cdr color))))))
 
 ;;; ** evil-easymotion
-(evilem-default-keybindings ",")
+(use-package evil-easymotion
+  :ensure t
+  :config
+  (evilem-default-keybindings ","))
 
 ;;; ** evil-nerd-commenter
-(global-set-key (kbd "M-;") 'evilnc-comment-or-uncomment-lines)
-(global-set-key (kbd "C-c l") 'evilnc-quick-comment-or-uncomment-to-the-line)
-(global-set-key (kbd "C-c c") 'evilnc-copy-and-comment-lines)
-(global-set-key (kbd "C-c p") 'evilnc-comment-or-uncomment-paragraphs)
+(use-package evil-nerd-commenter
+  :ensure t
+  :config
+  (global-set-key (kbd "M-;") 'evilnc-comment-or-uncomment-lines)
+  (global-set-key (kbd "C-c l") 'evilnc-quick-comment-or-uncomment-to-the-line)
+  (global-set-key (kbd "C-c c") 'evilnc-copy-and-comment-lines)
+  (global-set-key (kbd "C-c p") 'evilnc-comment-or-uncomment-paragraphs))
 
 ;;; ** key-chord
 ;; for mapping escape key in evil-mode
@@ -323,6 +329,10 @@
 ;;		))))
 ;; (defface my-powerline-active1 '((t (:foreground "0D6E0E" :background "OliveDrab2" :inherit mode-line))) :group 'powerline)
 
+(use-package powerline
+  :ensure t
+  :config
+  (powerline-default-theme))
 
 (require 'powerline)
 ;; (require 'powerline-evil)
@@ -346,72 +356,77 @@
 
 ;;; ** ido
 
-(require 'ido)
-(ido-mode t)
-(setq ido-decorations (quote ("\n-> " "" "\n   " "\n   ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]"))) ; Display ido results vertically, rather than horizontally
-(defun ido-disable-line-truncation () (set (make-local-variable 'truncate-lines) nil))
-(add-hook 'ido-minibuffer-setup-hook 'ido-disable-line-truncation)
-(global-set-key (kbd "M-i") 'ido-goto-symbol)
-(global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
-(global-set-key (kbd "C-b") nil)
-(global-set-key (kbd "C-b") 'ido-switch-buffer)
-(global-set-key (kbd "s-b") 'ido-switch-buffer)
+(use-package ido
+  :preface
+  (defun ido-disable-line-truncation ()
+    (set (make-local-variable 'truncate-lines) nil))
+  (defun ido-goto-symbol (&optional symbol-list)
+    "Refresh imenu and jump to a place in the buffer using Ido."
+    (interactive)
+    (unless (featurep 'imenu)
+      (require 'imenu nil t))
+    (cond
+     ((not symbol-list)
+      (let ((ido-mode ido-mode)
+	    (ido-enable-flex-matching
+	     (if (boundp 'ido-enable-flex-matching)
+		 ido-enable-flex-matching t))
+	    ;; N.B. `let' syntax, symbol solely will be bould to nil
+	    name-and-pos symbol-names position)
+	(unless ido-mode
+	  (ido-mode 1)
+	  (setq ido-enable-flex-matching t))
+	(while (progn
+		 ;; this is "repeat...until" mode of while loop
+		 ;; the last statement will act as the end-test
+		 (imenu--cleanup)
+		 (setq imenu--index-alist nil)
+		 (ido-goto-symbol (imenu--make-index-alist)) ; generate the symbols
+		 (setq selected-symbol
+		       (ido-completing-read "Symbol: " symbol-names))
+		 (string= (car imenu--rescan-item) selected-symbol)))
+	(unless (and (boundp 'mark-active) mark-active)
+	  (push-mark nil t nil))
+	(setq position (cdr (assoc selected-symbol name-and-pos)))
+	(cond
+	 ((overlayp position)
+	  (goto-char (overlay-start position)))
+	 (t
+	  (goto-char position)))))
+     ((listp symbol-list)
+      (dolist (symbol symbol-list)
+	(let (name position)
+	  (cond
+	   ((and (listp symbol) (imenu--subalist-p symbol))
+	    (ido-goto-symbol symbol))
+	   ((listp symbol)
+	    (setq name (car symbol))
+	    (setq position (cdr symbol)))
+	   ((stringp symbol)
+	    (setq name symbol)
+	    (setq position
+		  (get-text-property 1 'org-imenu-marker symbol))))
+	  (unless (or (null position) (null name) ;; test if variable is still nil
+		      (string= (car imenu--rescan-item) name))
+	    (add-to-list 'symbol-names name)
+	    (add-to-list 'name-and-pos (cons name position))))))))
+
+  :config
+  (ido-mode t)
+  (setq ido-decorations
+	;; Display ido results vertically, rather than horizontally
+	(quote ("\n-> " "" "\n   " "\n   ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]")))
+  (add-hook 'ido-minibuffer-setup-hook 'ido-disable-line-truncation)
+  (global-set-key (kbd "M-i") 'ido-goto-symbol)
+  (global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
+  (global-set-key (kbd "C-b") nil)
+  (global-set-key (kbd "C-b") 'ido-switch-buffer)
+  (global-set-key (kbd "s-b") 'ido-switch-buffer))
 ;; (global-set-key (kbd "C-x b") 'list-buffers)
 ;; (global-set-key (kbd "C-x C-b") 'list-buffers)
 ;; (global-set-key (kbd "C-x b") 'ido-switch-buffer)
 
 ;; From EmacsWiki
-(defun ido-goto-symbol (&optional symbol-list)
-  "Refresh imenu and jump to a place in the buffer using Ido."
-  (interactive)
-  (unless (featurep 'imenu)
-    (require 'imenu nil t))
-  (cond
-   ((not symbol-list)
-    (let ((ido-mode ido-mode)
-	  (ido-enable-flex-matching
-	   (if (boundp 'ido-enable-flex-matching)
-	       ido-enable-flex-matching t))
-	  ;; N.B. `let' syntax, symbol solely will be bould to nil
-	  name-and-pos symbol-names position)
-      (unless ido-mode
-	(ido-mode 1)
-	(setq ido-enable-flex-matching t))
-      (while (progn
-	       ;; this is "repeat...until" mode of while loop
-	       ;; the last statement will act as the end-test
-	       (imenu--cleanup)
-	       (setq imenu--index-alist nil)
-	       (ido-goto-symbol (imenu--make-index-alist)) ; generate the symbols
-	       (setq selected-symbol
-		     (ido-completing-read "Symbol: " symbol-names))
-	       (string= (car imenu--rescan-item) selected-symbol)))
-      (unless (and (boundp 'mark-active) mark-active)
-	(push-mark nil t nil))
-      (setq position (cdr (assoc selected-symbol name-and-pos)))
-      (cond
-       ((overlayp position)
-	(goto-char (overlay-start position)))
-       (t
-	(goto-char position)))))
-   ((listp symbol-list)
-    (dolist (symbol symbol-list)
-      (let (name position)
-	(cond
-	 ((and (listp symbol) (imenu--subalist-p symbol))
-	  (ido-goto-symbol symbol))
-	 ((listp symbol)
-	  (setq name (car symbol))
-	  (setq position (cdr symbol)))
-	 ((stringp symbol)
-	  (setq name symbol)
-	  (setq position
-		(get-text-property 1 'org-imenu-marker symbol))))
-	(unless (or (null position) (null name) ;; test if variable is still nil
-		    (string= (car imenu--rescan-item) name))
-	  (add-to-list 'symbol-names name)
-	  (add-to-list 'name-and-pos (cons name position))))))))
-
 (defvar smart-use-extended-syntax nil
   "If t the smart symbol functionality will consider extended
 syntax in finding matches, if such matches exist.")
@@ -611,37 +626,35 @@ instead."
 
 ;;; ** auto-complete
 
-(add-hook 'after-init-hook (lambda ()
-			     (require 'auto-complete-config)
-			     (add-to-list 'ac-dictionary-directories "~/.emacs.d/auto-complete/dict")
-			     (ac-config-default)
-			     (setq-default ac-sources '(
-							ac-source-yasnippet
-							ac-source-abbrev
-							ac-source-dictionary
-							ac-source-words-in-same-mode-buffers
-							))
-			     ))
-
-(add-hook 'after-init-hook (lambda ()
-			     (progn
-			       (defun ac-cc-mode-setup ()
-				 (setq ac-clang-complete-executable "~/.emacs.d/emacs-clang-complete-async/clang-complete")
-				 (setq ac-sources '(ac-source-clang-async))
-				 (ac-clang-launch-completion-process)
-				 )
-			       (defun ac-go-mode-setup ()
-					; (require 'go-autocomplete)
-				 (require 'auto-complete-config)
-				 (add-hook 'before-save-hook #'gofmt-before-save))
-
-			       (defun my-ac-config ()
-				 (add-hook 'c-mode-common-hook 'ac-cc-mode-setup)
-				 (add-hook 'auto-complete-mode-hook 'ac-common-setup)
-				 (add-hook 'go-mode-hook 'ac-go-mode-setup)
-				 )
-
-			       (my-ac-config))))
+(use-package auto-complete
+  :ensure t
+  :init
+  (add-hook 'after-init-hook
+	    (lambda ()
+	      (require 'auto-complete-config)
+	      (add-to-list 'ac-dictionary-directories "~/.emacs.d/auto-complete/dict")
+	      (ac-config-default)
+	      (setq-default ac-sources
+			    '(ac-source-yasnippet
+			      ac-source-abbrev
+			      ac-source-dictionary
+			      ac-source-words-in-same-mode-buffers))))
+  (add-hook 'after-init-hook
+	    (lambda ()
+	      (progn
+		(defun ac-cc-mode-setup ()
+		  (setq ac-clang-complete-executable "~/.emacs.d/emacs-clang-complete-async/clang-complete")
+		  (setq ac-sources '(ac-source-clang-async))
+		  (ac-clang-launch-completion-process))
+		(defun ac-go-mode-setup ()
+		  ;; (require 'go-autocomplete)
+		  (require 'auto-complete-config)
+		  (add-hook 'before-save-hook #'gofmt-before-save))
+		(defun my-ac-config ()
+		  (add-hook 'auto-complete-mode-hook 'ac-common-setup)
+		  ;; (add-hook 'c-mode-common-hook 'ac-cc-mode-setup)
+		  ;; (add-hook 'go-mode-hook 'ac-go-mode-setup))
+		  (my-ac-config))))))
 
 ;;; cursor
 ;; (setq-default cursor-type 'hbar)
@@ -695,22 +708,21 @@ This is the same as using \\[set-mark-command] with the prefix argument."
 
 
 ;;; ** markdown-mode
-
-(add-to-list 'load-path "~/.emacs.d/markdown-mode")
-(require 'markdown-mode)
-(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-(add-hook 'markdown-mode-hook
-	  (function
-	   (lambda ()
-	     (setq tab-width 4
-		   indent-tabs-mode nil)
-	     )))
-(add-hook 'markdown-mode-hook
-	  (function
-	   (lambda ()
-	     (local-set-key (kbd "<tab>") 'markdown-insert-pre)
-	     )))
-(add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
+(use-package markdown-mode
+  :ensure t
+  :mode "\\.md\\'"
+  :init
+  (add-hook 'markdown-mode-hook
+	    (function
+	     (lambda ()
+	       (setq tab-width 4
+		     indent-tabs-mode nil)
+	       )))
+  (add-hook 'markdown-mode-hook
+	    (function
+	     (lambda ()
+	       (local-set-key (kbd "<tab>") 'markdown-insert-pre)
+	       ))))
 
 ;;; ** org
 (custom-set-variables
@@ -1098,14 +1110,15 @@ unwanted space when exporting org-mode to html."
 
 ;;; ** zencoding
 
-(add-to-list 'load-path "~/.emacs.d/zencoding")
-(require 'zencoding-mode)
-(add-hook 'sgml-mode-hook 'zencoding-mode)
+(use-package zencoding-mode
+  :ensure t
+  :config
+  (add-hook 'sgml-mode-hook 'zencoding-mode))
 
 ;;; ** c-mode and c-common-mode
 
-(require 'google-c-style)
-(add-hook 'c-mode-common-hook 'google-set-c-style)
+(use-package google-c-style
+  :ensure t)
 (defun my-c-style-hook ()
   (let ((filename (buffer-file-name))
 	(google-c-lineup-expression-plus-8
@@ -1166,7 +1179,7 @@ unwanted space when exporting org-mode to html."
 		;;		    '(c-lineup-gcc-asm-reg (c-lineup-argcont 0)))
 		;; (c-set-offset 'statement-cont 8)
 		)))))
-
+(add-hook 'c-mode-common-hook 'google-set-c-style)
 (add-hook 'c-mode-hook 'my-c-style-hook)
 (add-hook 'c++-mode-hook 'my-c-style-hook)
 

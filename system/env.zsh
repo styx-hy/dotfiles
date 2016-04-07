@@ -9,3 +9,6 @@ fi
 # make `less' more friendly
 LESSHISTFILE=/dev/null
 export LESS="-F -X -R"
+
+# Homebrew repository
+export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles
