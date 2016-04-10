@@ -334,9 +334,8 @@
   :config
   (powerline-default-theme))
 
-(require 'powerline)
-;; (require 'powerline-evil)
-(powerline-default-theme)
+;; (require 'telephone-line)
+;; (telephone-line-mode 1)
 
 ;; hl-line-mode
 ;; (require 'hl-line)
