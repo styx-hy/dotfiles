@@ -328,11 +328,90 @@
 ;;				    ))
 ;;		))))
 ;; (defface my-powerline-active1 '((t (:foreground "0D6E0E" :background "OliveDrab2" :inherit mode-line))) :group 'powerline)
+(use-package s
+  :ensure t)
 
 (use-package powerline
   :ensure t
   :config
-  (powerline-default-theme))
+  (powerline-styx-theme)
+  :preface
+  (defun styx:vc-modeline ()
+    "Version control information."
+    (when vc-mode
+      (s-trim
+       (concat vc-mode " "
+	       (when (buffer-file-name)
+		 (pcase (vc-state (buffer-file-name))
+		   (`up-to-date "")
+		   (`edited "*")
+		   (`added "➕")
+		   (`unregistered "?")
+		   (`removed "➖")
+		   (`needs-merge "⇆")
+		   (`needs-update "↥")
+		   (`ignored "∅")
+		   (_ " Unk"))) " "))))
+  (defvar lunaryorn-vc-mode-line
+  '(" " (:propertize
+         ;; Strip the backend name from the VC status information
+         (:eval (let ((backend (symbol-name (vc-backend (buffer-file-name)))))
+                  (substring vc-mode (+ (length backend) 2))))
+         face font-lock-variable-name-face))
+  "Mode line format for VC Mode.")
+  (defun powerline-styx-theme ()
+    "Setup the default mode-line."
+    (interactive)
+    (setq-default mode-line-format
+		  '("%e"
+		    (:eval
+		     (let* ((active (powerline-selected-window-active))
+			    (mode-line (if active 'mode-line 'mode-line-inactive))
+			    (face1 (if active 'powerline-active1 'powerline-inactive1))
+			    (face2 (if active 'powerline-active2 'powerline-inactive2))
+			    (separator-left (intern (format "powerline-%s-%s"
+							    (powerline-current-separator)
+							    (car powerline-default-separator-dir))))
+			    (separator-right (intern (format "powerline-%s-%s"
+							     (powerline-current-separator)
+							     (cdr powerline-default-separator-dir))))
+			    (lhs (list (powerline-raw "%*" nil 'l)
+				       (when powerline-display-buffer-size
+					 (powerline-buffer-size nil 'l))
+				       (when powerline-display-mule-info
+					 (powerline-raw mode-line-mule-info nil 'l))
+				       (powerline-buffer-id nil 'l)
+				       (when (and (boundp 'which-func-mode) which-func-mode)
+					 (powerline-raw which-func-format nil 'l))
+				       (powerline-raw " ")
+				       (funcall separator-left mode-line face1)
+				       (when (and (boundp 'erc-track-minor-mode) erc-track-minor-mode)
+					 (powerline-raw erc-modified-channels-object face1 'l))
+				       (powerline-major-mode face1 'l)
+				       (powerline-process face1)
+				       (powerline-minor-modes face1 'l)
+				       (powerline-narrow face1 'l)
+				       (powerline-raw " " face1)
+				       (funcall separator-left face1 face2)
+				       ;; (powerline-vc face2 'r)
+				       (powerline-raw (styx:vc-modeline) face2 'r)
+				       (when (bound-and-true-p nyan-mode)
+					 (powerline-raw (list (nyan-create)) face2 'l))))
+			    (rhs (list (powerline-raw global-mode-string face2 'r)
+				       (funcall separator-right face2 face1)
+				       (unless window-system
+					 (powerline-raw (char-to-string #xe0a1) face1 'l))
+				       (powerline-raw "%4l" face1 'l)
+				       (powerline-raw ":" face1 'l)
+				       (powerline-raw "%3c" face1 'r)
+				       (funcall separator-right face1 mode-line)
+				       (powerline-raw " ")
+				       (powerline-raw "%6p" nil 'r)
+				       (when powerline-display-hud
+					 (powerline-hud face2 face1)))))
+		       (concat (powerline-render lhs)
+			       (powerline-fill face2 (powerline-width rhs))
+			       (powerline-render rhs))))))))
 
 ;; (require 'telephone-line)
 ;; (telephone-line-mode 1)
