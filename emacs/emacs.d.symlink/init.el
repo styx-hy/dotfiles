@@ -616,9 +616,13 @@ instead."
 
 (use-package yasnippet
   :ensure t
-  :no-require t
-  :defines yas-minor-mode-map
-  :preface
+  ;; :no-require t
+  :diminish yas-minor-mode ;; remove yas indicator from mode line
+  ;; :defines yas-minor-mode-map
+  :init
+  (add-hook 'c-mode-hook
+	    (lambda ()
+	      (yas-minor-mode)))
   (defadvice yas/insert-snippet (around use-completing-prompt activate)
     "Use `yas/completing-prompt' for `yas/prompt-functions' but only here..."
     (let ((yas-prompt-functions '(yas/completing-prompt)))
@@ -644,22 +648,20 @@ instead."
 	  (delete-char (- init-word original-point))
 	  (insert key)
 	  (yas-expand)))))
-  :bind-keymap
+  ;; :bind-keymap
+  :bind
   ;; XXX must be keymaps defined in the package instead of command functions
   ;; first unbind the tab from auto expand
   ;; (define-key yas-minor-mode-map (kbd "TAB") nil)
   ;; (define-key yas-minor-mode-map [(tab)] nil)
   ;; (yas-global-mode 1)
-
-  ;; (:map yas-minor-mode-map
-  (("C-c ; u" . yas-expand)
-   ("<C-tab>" . yas-ido-expand))
+  (:map yas-minor-mode-map
+	;; (
+	;; ("C-c ; u" . yas-expand)
+	;; ("<C-tab>" . yas-ido-expand))
+	("C-c ; u" . yas-expand))
   :config
-  (add-hook 'c-mode-hook
-	    (lambda ()
-	      (yas-minor-mode)))
-  ;; (yas-reload-all)
-  )
+  (yas-reload-all))
 
 ;; (add-to-list 'yas-snippet-dirs "~/.emacs.d/snippets")
 
