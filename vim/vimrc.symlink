@@ -245,3 +245,4 @@ nnoremap dc bde
 noremap % v%
 nmap <silent> <leader>k :bp\|bd #<CR>
 imap jj <Esc>
+nnoremap <leader><leader>i :CtrlPTag<CR>
