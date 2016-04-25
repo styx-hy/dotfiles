@@ -131,9 +131,13 @@
 (require 'use-package)
 
 ;;; ** ag
-(setq ag-highlight-search t)
-(setq ag-reuse-window 't)
-(global-set-key [f2] 'ag-project)
+(use-package ag
+  :ensure t
+  :config
+  (setq ag-highlight-search t)
+  (setq ag-reuse-window 't)
+  (global-set-key [f2] 'ag-project)
+  )
 ;;; ** ansi-term
 (add-hook 'term-exec-hook
 	  (function
@@ -191,8 +195,45 @@
 ;;; ** evil
 (use-package evil
   :ensure t
+  :init
+  (defun evil-search-symbol (forward)
+    "Search for symbol near point. If FORWARD is nil,
+ search backward, otherwise forward."
+    (let ((string (car-safe regexp-search-ring))
+	  (move (if forward 'forward-char 'backward-char))
+	  (end (if forward 'eobp 'bobp)))
+      (setq isearch-forward forward)
+      (cond
+       ((and (memq last-command
+		   '(evil-search-symbol-forward
+		     evil-search-symbol-backward))
+	     (stringp string)
+	     (not (string= string "")))
+	(evil-search string forward t))
+       (t
+	(setq string (evil-find-symbol forward))
+	(if (null string)
+	    (error "No symbol under point")
+	  (setq string (format "\\_<%s\\_>" (regexp-quote string))))
+	(evil-search string forward t)))))
   :config
-  (evil-mode 1))
+  (evil-mode 1)
+  (evil-define-motion evil-search-symbol-backward (count)
+    "Search backward for symbol under point."
+    :jump t
+    :type exclusive
+    (dotimes (var (or count 1))
+      (evil-search-symbol nil)))
+  (evil-define-motion evil-search-symbol-forward (count)
+    "Search backward for symbol under point."
+    :jump t
+    :type exclusive
+    (dotimes (var (or count 1))
+      (evil-search-symbol t)))
+  :bind
+  (:map evil-motion-state-map
+	("#" . evil-search-symbol-backward)
+	("*" . evil-search-symbol-forward)))
 ;; (add-hook 'evil-after-load-hook
 ;;          (lambda ()
 ;;          ;; config
@@ -1301,10 +1342,13 @@ unwanted space when exporting org-mode to html."
 		(c-set-style "linux-tabs-only")))))
 
 ;; highlight fixme
-(add-hook 'tex-mode-hook
-	  (lambda ()
-	    (font-lock-add-keywords nil
-				    '(("\\<\\(FIXME\\|TODO\\|BUG\\):" 1 font-lock-warning-face t)))))
+(use-package fic-mode
+  :ensure t
+  :diminish fic-minor-mode
+  :init
+  (setq fic-highlighted-words '("FIXME" "TODO" "BUG" "XXX"))
+  :config
+  (add-hook 'prog-mode-hook 'fic-mode))
 
 ;; (add-hook 'c-mode-common-hook 'google-make-newline-indent)
 
