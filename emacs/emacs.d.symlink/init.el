@@ -257,7 +257,21 @@
 (use-package evil-easymotion
   :ensure t
   :config
-  (evilem-default-keybindings ","))
+  (define-key evil-motion-state-map (kbd ",") nil)
+  (evilem-define (kbd ", j") #'next-line)
+  (evilem-define (kbd ", k") #'previous-line)
+  (evilem-define (kbd ", , w") #'evil-forward-word-begin)
+  (evilem-define (kbd ", , W") #'evil-forward-WORD-begin)
+  (evilem-define (kbd ", , e") #'evil-forward-word-end)
+  (evilem-define (kbd ", , E") #'evil-forward-WORD-end)
+  (evilem-define (kbd ", , b") #'evil-backward-word-begin)
+  (evilem-define (kbd ", , B") #'evil-backward-WORD-begin)
+  (evilem-define (kbd ", , ge") #'evil-backward-word-end)
+  (evilem-define (kbd ", , gE") #'evil-backward-WORD-end)
+  (evilem-define (kbd ", , n") #'evil-search-next
+		 :bind (((symbol-function #'isearch-lazy-highlight-update)
+			 #'ignore)
+			(search-highlight nil))))
 
 ;;; ** evil-nerd-commenter
 (use-package evil-nerd-commenter
