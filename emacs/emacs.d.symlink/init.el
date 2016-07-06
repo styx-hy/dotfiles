@@ -145,7 +145,7 @@
 	     (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))))
 
 ;;; ** auctex
-;;set xetex mode in tex/latex
+;; set xetex mode in tex/latex
 (use-package auctex
   :ensure t
   :mode ("\\.tex\\'" . latex-mode)
@@ -291,6 +291,19 @@
   (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
   (key-chord-mode 1))
 
+;;; ** flyspell
+(use-package flyspell
+  :ensure t
+  :config
+  (setq ispell-program-name "/usr/local/bin/aspell")
+  (setq ispell-dictionary "english")
+  (setq ispell-dictionary-alist
+	(let ((default '("[A-Za-z]" "[^A-Za-z]" "[']" nil
+			 ("-B" "-d" "english" "--dict-dir"
+			  "/Library/Application Support/cocoAspell/aspell6-en-6.0-0")
+			 nil iso-8859-1)))
+	  `((nil ,@default)
+	    ("english" ,@default)))))
 ;;; ** Git
 
 ;; (add-to-list 'load-path "/usr/local/share/git-core/contrib/emacs")
@@ -813,7 +826,8 @@ instead."
 ;; (setq mac-command-modifier 'meta)
 ;; (setq mac-option-modifier nil)
 ;; (global-set-key [f1] 'term) ;; instead of shell
-(global-set-key [f1] 'eshell)
+;; (global-set-key [f1] 'eshell)
+(global-set-key [f1] 'ansi-term)
 (global-set-key (kbd "C-,") 'beginning-of-buffer)
 (global-set-key (kbd "C-.") 'end-of-buffer)
 (global-set-key [f5] 'revert-buffer)
