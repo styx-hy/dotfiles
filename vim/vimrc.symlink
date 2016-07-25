@@ -186,6 +186,13 @@ Plugin 'honza/vim-snippets'
 " Track the engine.
 Plugin 'SirVer/ultisnips'
 
+" neocomplete
+Plugin 'Shougo/neocomplete'
+let g:neocomplete#enable_at_startup = 1
+
+" Linux kernel code style
+Plugin 'vivien/vim-linux-coding-style'
+
 " Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
 let g:UltiSnipsExpandTrigger="<S-Tab>"
 " let g:UltiSnipsJumpForwardTrigger="<c-b>"
