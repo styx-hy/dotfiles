@@ -46,10 +46,11 @@ unwanted space when exporting org-mode to html."
 ;; (defadvice org-html-template
 ;;     (after org-html-disable-title-in-content (contents info) activate)
 (defun disable-title-in-index (orig-fun &rest args)
-  (when (string-equal (file-name-nondirectory buffer-file-name) "index.org")
-      (let ((buf (apply orig-fun args)))
-	(replace-regexp-in-string "<h1 class=\"title\">.*\n" "" buf))))
-;; (advice-add 'org-html-template :around #'disable-title-in-index)
+  (let ((buf (apply orig-fun args)))
+    (if (string-equal (file-name-nondirectory buffer-file-name) "index.org")
+	(replace-regexp-in-string "<h1 class=\"title\">.*\n" "" buf)
+      buf)))
+(advice-add 'org-html-template :around #'disable-title-in-index)
 
 (defun remove-index-from-sitemap (orig-fun &rest args)
   "Actually apply the modification *AFTER* the original call,
