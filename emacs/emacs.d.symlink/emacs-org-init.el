@@ -84,11 +84,11 @@ the sitemap buffer so I have to open it again and do replacement."
 	;;  #+BEGIN_HTML
 	;;    <span class=\"timestamp\">\\1</span>
 	;;  #+END_HTML")
-	(re-search-forward " \\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\)\\]\\]")
-	(replace-match "]]
+	(while (search-forward-regexp " \\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\)\\]\\]" nil t)
+	  (replace-match "]]
      #+BEGIN_HTML
        <span class=\"timestamp\">\\1</span>
-     #+END_HTML")
+     #+END_HTML"))
 	(save-buffer)))))
 
 (advice-add 'org-publish-org-sitemap :around #'remove-index-from-sitemap)
