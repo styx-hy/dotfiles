@@ -13,6 +13,8 @@
 (blink-cursor-mode -1)
 (add-to-list 'load-path "~/.emacs.d/elpa")
 (add-to-list 'load-path "~/.emacs.d/etc")
+(setq url-proxy-services
+      '(("http" . "127.0.0.1:7777")))
 
 ;; emacs -nw:  emacs in terminal
 ;; map RET to [return] in terminal mode, fix `ret` in cscope jumping
@@ -1065,153 +1067,7 @@ This is the same as using \\[set-mark-command] with the prefix argument."
   :init
   (setq reftex-plug-into-AUCTeX t))
 
-(defun org-mode-reftex-setup ()
-  ;; (load-library "reftex")
-  (require 'reftex)
-  (and (buffer-file-name) (file-exists-p (buffer-file-name))
-       (progn
-	 ;; enable auto-revert-mode to update reftex when bibtex file changes on disk
-	 (global-auto-revert-mode t)
-	 (reftex-parse-all)
-	 ;; add a custom reftex cite format to insert links
-	 (reftex-set-cite-format
-	  '((?b . "[[bib:%l][%l-bib]]")
-	    (?n . "[[notes:%l][%l-notes]]")
-	    (?p . "[[papers:%l][%l-paper]]")
-	    (?t . "%t")
-	    (?h . "** %t\n:PROPERTIES:\n:Custom_ID: %l\n:END:\n[[papers:%l][%l-paper]]")))))
-  (define-key org-mode-map (kbd "C-c )") 'reftex-citation)
-  (define-key org-mode-map (kbd "C-c (") 'org-mode-reftex-search))
-
-(add-hook 'org-mode-hook 'org-mode-reftex-setup)
-
-;;; ** org-jekyll
-;; (require 'org-publish)
-(setq org-export-async-debug t)
-;; (setq org-html-html5-fancy t)
-
-(defadvice org-html-paragraph (before org-html-paragraph-advice
-				      (paragraph contents info) activate)
-  "Join consecutive Chinese lines into a single long line without
-unwanted space when exporting org-mode to html."
-  (let* ((fixed-contents)
-	 (origin-contents (ad-get-arg 1))
-	 (fix-regexp "[[:multibyte:]]"))
-    (setq fixed-contents
-	  (replace-regexp-in-string
-	   (concat
-	    "\\(" fix-regexp "\\) *\n *\\(" fix-regexp "\\)") "\\1\\2"
-	    origin-contents))
-    (ad-set-arg 1 fixed-contents)))
-
-(defadvice org-publish-org-sitemap
-    (after remove-index-from-sitemap (project &optional sitemap-filename) activate)
-  ;; search backward because the default position is at the end
-  ;; because the buffer is closed by `org-publish-org-sitemap'
-  ;; so I have to open it again
-  (with-current-buffer
-      ;; (let* ((project-plist (cdr project))
-      ;;	     (dir (file-name-as-directory
-      ;;		   (plist-get project-plist :base-directory)))
-      ;;	     (sitemap-filename (concat dir (or sitemap-filename "sitemap.org"))))
-      ;;	(setq sitemap-buffer
-      ;;	      (find-file sitemap-filename)))
-
-      ;; move cursor to beginning of buffer
-      ;; (beginning-of-buffer)
-      (goto-char (point-min))
-    ;; search for index and delete it
-    (while (search-forward-regexp "^.*\\(index\\|about\\|header\\).*\n" nil t)
-      (replace-match "" t t))
-
-    ;; move date to a span outside anchor
-    ;; (beginning-of-buffer)
-    (goto-char (point-min))
-    ;; (re-search-forward " \\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\)\\]\\]" "]]
-    ;;  #+BEGIN_HTML
-    ;;    <span class=\"timestamp\">\\1</span>
-    ;;  #+END_HTML")
-    (re-search-forward " \\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\)\\]\\]")
-    (replace-match "]]
-     #+BEGIN_HTML
-       <span class=\"timestamp\">\\1</span>
-     #+END_HTML")
-    (save-buffer)))
-
-(defadvice org-html-template
-    (after org-html-disable-title-in-content (contents info) activate)
-  (if (string-equal (file-name-nondirectory buffer-file-name) "index.org")
-      (setq ad-return-value
-	    (replace-regexp-in-string "<h1 class=\"title\">.*\n" "" ad-return-value))))
-
-;; (defadvice org-publish-org-sitemap
-;;   (around remove-index-from-sitemap (project &optional sitemap-filename) activate)
-;;   (let ((project (ad-get-arg 0)))
-;;     (ad-set-arg 0 (cons (car project) (plist-put (cdr project) :exclude "index.org")))
-;;     (ad-do-it)
-;;     (plist-put (cdr project) :exclude nil)))
-
-;; (defun my-org-html-publish-to-html (plist filename pub-dir)
-;;   ;; (message "---------")
-;;   ;; (message filename)
-;;   (if (string-equal (file-name-nondirectory filename) "sitemap.org")
-;;       (org-html-publish-to-html (plist-put plist :body-only t)
-;;				filename pub-dir)
-;;     (org-html-publish-to-html plist filename pub-dir)))
-
-(setq org-publish-project-alist
-      '(
-	("org-blog"
-	 :base-directory "~/Documents/Dropbox/notes/org-blog/"
-	 :base-extension "org"
-	 :publishing-directory "~/p/org-blog/"
-	 :recursive t
-	 :publishing-function org-html-publish-to-html
-	 :headline-levels 4               ; Just the default for this project.
-	 :auto-preamble nil
-	 :auto-sitemap t                  ; Generate sitemap.org automagically...
-	 :sitemap-filename "sitemap.org"  ; ... call it sitemap.org (it's the default)...
-	 :sitemap-title ""                ; ... with title 'Sitemap'.
-	 :sitemap-file-entry-format "%t %d"
-	 :sitemap-sort-files anti-chronologically
-	 :export-creator-info nil    ; Disable the inclusion of "Created by Org" in the postamble.
-	 :export-author-info nil     ; Disable the inclusion of "Author: Your Name" in the postamble.
-	 :auto-postamble nil         ; Disable auto postamble
-	 :table-of-contents t        ; Set this to "t" if you want a table of contents, set to "nil" disables TOC.
-	 :section-numbers nil        ; Set this to "t" if you want headings to have numbers.
-	 ;; :html-postamble "    <p class=\"postamble\">Last Updated %d.</p> " ; your personal postamble
-
-	 :html-preamble "<div class=\"header\">
-<div class=\"header-menu\">
-<ul>
-<li><a href=\"about.html\"><b>ABOUT</b></a>
-</li>
-</ul>
-</div>
-<section class=\"header-name\"><a href=\"/\"><b>Y</b>ANG<b>H</b>ONG</a></section>
-</div>
-"
-	 :html-postamble "<div id=\"disqus_thread\"></div>
-    <script type=\"text/javascript\">
-	/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-	var disqus_shortname = 'yanghong'; // required: replace example with your forum shortname
-
-	/* * * DON'T EDIT BELOW THIS LINE * * */
-	(function() {
-	    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-	    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-	    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-	})();
-    </script>
-    <noscript>Please enable JavaScript to view the <a href=\"http://disqus.com/?ref_noscript\">comments powered by Disqus.</a></noscript>
-    <a href=\"http://disqus.com\" class=\"dsq-brlink\">comments powered by <span class=\"logo-disqus\">Disqus</span></a>"
-	 :html-head-include-default-style nil  ;Disable the default css style
-	 :html-head-include-scripts nil
-	 :html-html5-fancy t
-	 :html-doctype "html5"
-
-	 :with-toc nil			; Disable table of contents
-	 )))
+(load "~/.emacs.d/emacs-org-init.el")
 
 ;;; ** linum-mode
 ;; (global-linum-mode 1)
