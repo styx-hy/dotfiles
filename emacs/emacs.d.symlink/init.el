@@ -1069,6 +1069,8 @@ This is the same as using \\[set-mark-command] with the prefix argument."
 
 (load "~/.emacs.d/emacs-org-init.el")
 
+(load "~/.emacs.d/emacs-nlinum-init.el")
+
 ;;; ** linum-mode
 ;; (global-linum-mode 1)
 ;; seperate line numbers from text
@@ -1087,7 +1089,7 @@ This is the same as using \\[set-mark-command] with the prefix argument."
    ;; (propertize " " 'face 'mode-line)
    ))
 (setq linum-format 'linum-format-func)
-(global-linum-mode 1)
+; (global-linum-mode 1)
 
 (column-number-mode 1)
 (add-hook 'linum-mode-hook (lambda ()
@@ -1165,6 +1167,8 @@ This is the same as using \\[set-mark-command] with the prefix argument."
 	       (or (string-match "cse-lab"
 				 (expand-file-name filename))
 		   (string-match "yparse"
+				 (expand-file-name filename))
+		   (string-match "dsm"
 				 (expand-file-name filename))))
       (setq c-basic-offset 4)
       (c-set-offset 'arglist-intro
