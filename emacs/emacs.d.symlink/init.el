@@ -3,6 +3,7 @@
 (setq inhibit-startup-message t)
 (when window-system
   (scroll-bar-mode -1)
+  (horizontal-scroll-bar-mode -1)
   (tool-bar-mode -1))
 (display-time-mode t)
 (when (not window-system)
