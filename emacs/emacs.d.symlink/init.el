@@ -446,10 +446,12 @@
 	    (add-to-list 'name-and-pos (cons name position))))))))
 
   :config
-  (ido-mode t)
+  (ido-mode 'both)
   (setq ido-decorations
 	;; Display ido results vertically, rather than horizontally
 	(quote ("\n-> " "" "\n   " "\n   ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]")))
+  (setq ido-max-directory-size 100000)
+  (setq ido-everywhere t)
   (add-hook 'ido-minibuffer-setup-hook 'ido-disable-line-truncation)
   (global-set-key (kbd "M-i") 'ido-goto-symbol)
   (global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
