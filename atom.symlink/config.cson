@@ -15,6 +15,7 @@
       "tmp"
       "vendor"
     ]
+    telemetryConsent: "no"
     themes: [
       "unity-ui"
       "glacier-syntax"
@@ -26,7 +27,7 @@
     showIndentGuide: true
     softWrapAtPreferredLineLength: true
   "go-plus":
-    goPath: "/Users/holman/Code/go"
+    panelDisplayMode: "closed"
   "linter-eslint":
     useGlobalEslint: true
   "release-notes":

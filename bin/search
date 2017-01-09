@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Quick search in a directory for a string ($1).
+# Quick search in a directory for a string ($@).
 #
 set -e
 
