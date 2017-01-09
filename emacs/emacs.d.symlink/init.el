@@ -952,6 +952,22 @@ This is the same as using \\[set-mark-command] with the prefix argument."
 ;; reftex settings
 (use-package reftex
   :commands turn-on-reftex
+  :preface
+  (defun get-bibtex-keys (file)
+    (with-current-buffer (find-file-noselect file)
+      (mapcar 'car (bibtex-parse-keys))))
+  (defun LaTeX-add-all-bibitems-from-bibtex ()
+    (interactive)
+    (mapc 'LaTeX-add-bibitems
+	  (apply 'append
+		 (mapcar 'get-bibtex-keys (reftex-get-bibfile-list)))))
+  ;; Rescan the bib file everytime I want to insert a citation
+  (defun update-latex-bibitems-list (orig-fun &rest args)
+    (progn (setq LaTeX-bibitem-list nil)
+	   (LaTeX-add-all-bibitems-from-bibtex)
+	   (apply orig-fun args)))
+  (advice-add 'reftex-citation :around #'update-latex-bibitems-list)
+
   :init
   (setq reftex-plug-into-AUCTeX t))
 
