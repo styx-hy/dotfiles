@@ -40,9 +40,10 @@
 
 ;; font
 ;; (add-to-list 'default-frame-alist
-;; 	     '(font . "Monaco-14"))
+;;	     '(font . "Monaco-14"))
 
 (if (eq system-type 'darwin)
+    "Set font for Mac"
     (progn
       (set-face-attribute 'default nil :family "Inconsolata")
       (if (< (display-pixel-width) 2560)
@@ -55,7 +56,7 @@
 	(set-fontset-font t charset (font-spec :family "PingFang SC" :size 14))))
   ;; (set-face-attribute 'default nil :family "DejaVu Sans Mono" :height 130)
   (add-to-list 'default-frame-alist
-	       '(font . "Monaco-12")))
+	       '(font . "Monospace")))
 
 
 ;; backup

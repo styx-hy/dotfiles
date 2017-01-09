@@ -70,11 +70,12 @@
     :jump t
     :type exclusive
     (dotimes (var (or count 1))
-      (evil-search-symbol t))))
-  ;; :bind
-  ;; (:map evil-motion-state-map
-  ;; 	("#" . evil-search-symbol-backward)
-  ;; 	("*" . evil-search-symbol-forward)))
+      (evil-search-symbol t)))
+  :bind
+  (:map evil-motion-state-map
+	("#" . evil-search-symbol-backward)
+	("*" . evil-search-symbol-forward)
+	("C-]" . helm-etags-select)))
 
 ;;; ** evil-easymotion
 (use-package evil-easymotion

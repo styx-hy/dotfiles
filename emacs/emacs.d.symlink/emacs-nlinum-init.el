@@ -2,6 +2,7 @@
   :ensure t
   :config
   (defun initialize-nlinum (&optional frame)
+    (setq nlinum-format "%d ")
     (add-hook 'prog-mode-hook (lambda () (nlinum-mode 1)))
     (add-hook 'text-mode-hook (lambda () (message "enable nlinum")(nlinum-mode 1)))
     )
