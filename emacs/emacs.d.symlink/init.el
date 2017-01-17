@@ -43,7 +43,7 @@
 ;;	     '(font . "Monaco-14"))
 
 (if (eq system-type 'darwin)
-    "Set font for Mac"
+    ;; Set font for Mac
     (progn
       (set-face-attribute 'default nil :family "Inconsolata")
       (if (< (display-pixel-width) 2560)
