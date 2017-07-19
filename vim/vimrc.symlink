@@ -76,6 +76,11 @@ Plugin 'VundleVim/Vundle.vim'
 " vim-go
 Plugin 'fatih/vim-go'
 let g:go_fmt_command = expand("goimports")
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_structs = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_build_constraints = 1
 
 " vim-powerline settings
 Plugin 'Lokaltog/vim-powerline'
@@ -184,7 +189,7 @@ Plugin 'tpope/vim-speeddating'
 Plugin 'honza/vim-snippets'
 
 " Track the engine.
-Plugin 'SirVer/ultisnips'
+" Plugin 'SirVer/ultisnips'
 
 " neocomplete
 Plugin 'Shougo/neocomplete'

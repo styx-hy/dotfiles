@@ -23,8 +23,8 @@ bind k confirm-before kill-pane
 unbind [
 bind Escape copy-mode
 
-# setw -g mode-keys vi
-setw -g mode-keys emacs
+setw -g mode-keys vi
+# setw -g mode-keys emacs
 setw -g xterm-keys on
 unbind %
 bind _ split-window -v
