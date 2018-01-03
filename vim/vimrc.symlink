@@ -13,7 +13,7 @@ set rtp+=$GOROOT/misc/vim
 
 " Wrap gitcommit file types at the appropriate length
 filetype indent plugin on
-hi Search guibg=LightBlue
+hi Search ctermbg=Yellow ctermfg=Black
 set hlsearch
 set nu
 set pastetoggle=<F2>
