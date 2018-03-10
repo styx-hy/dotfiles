@@ -24,6 +24,7 @@ unbind [
 bind Escape copy-mode
 
 setw -g mode-keys vi
+bind-key -T copy-mode-vi y send-keys -X copy-selection
 # setw -g mode-keys emacs
 setw -g xterm-keys on
 unbind %
