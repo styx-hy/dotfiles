@@ -4,7 +4,7 @@
 #
 # credit: aaronsvk @ https://github.com/Microsoft/WSL/issues/2003
 command_not_found_handler() {
-    if cmd.exe /c "(where $1 || (help $1 |findstr /V Try)) >nul 2>nul && ($* || exit 0)"; then
+	if [[ -n "$(uname -r | grep -q Microsoft)" ]] && cmd.exe /c "(where $1 || (help $1 |findstr /V Try)) >nul 2>nul && ($* || exit 0)"; then
         return $?
     else
         if [ -x /usr/lib/command-not-found ]; then
