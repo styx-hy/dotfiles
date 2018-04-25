@@ -14,5 +14,5 @@ export LESS="-F -X -R"
 export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles
 
 if [ "$(uname -s)" = "Linux" ]; then
-  export CHROMIUM_USER_FLAGS="--force-device-scale-factor=1.25"
+  export CHROMIUM_USER_FLAGS="--force-device-scale-factor=2"
 fi
