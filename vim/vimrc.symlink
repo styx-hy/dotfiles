@@ -49,6 +49,11 @@ else
   set viminfo='20,\"50,:20,%,n~/.vim/_viminfo
 endif
 
+if has('nvim') && has('win32')
+  let g:python_host_prog='C:/Users/styx/.nvim/py_venv/Scripts/python.exe'
+  let g:python3_host_prog='C:/Users/styx/.nvim/py3_venv/Scripts/python.exe'
+endif
+
 function! ResCur()
 	if line("'\"") <= line("$")
 		normal! g`"
@@ -112,14 +117,16 @@ let g:ycm_enable_diagnostic_highlighting = 0
 " Plugin 'tpope/vim-fugitive'
 
 " ctrlp-cmatcher
-Plugin 'JazzCore/ctrlp-cmatcher'
+" Plugin 'JazzCore/ctrlp-cmatcher'
 
 "ctrlp
 Plugin 'kien/ctrlp.vim'
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip
 " let g:ctrlp_cmd = 'CtrlPMRU'
-let g:ctrlp_match_func  = {'match' : 'matcher#cmatch'}
+" let g:ctrlp_match_func  = {'match' : 'matcher#cmatch'}
+if !has('win32')
 let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
+endif
 let g:ctrlp_working_path_mode = 'ra'
 let g:ctrlp_max_height = 10			" maxiumum height of match window
 let g:ctrlp_switch_buffer = 'et'	" jump to a file if it's open already
@@ -171,6 +178,7 @@ Plugin 'altercation/vim-colors-solarized'
 " mololkai
 Plugin 'tomasr/molokai'
 let g:molokai_original = 1
+let g:molokai_italic = 0
 let g:rehash256 = 1
 
 " vim-easymotion
@@ -223,7 +231,7 @@ filetype plugin indent on    " required
 " Put your non-Plugin stuff after this line
 
 " Settings of MacVim
-set guifont=PragmataPro:h14
+set guifont=Monaco:h14
 if has('gui_macvim')
 	set background=light
 	" colorscheme solarized " must be set after vundle#end()
