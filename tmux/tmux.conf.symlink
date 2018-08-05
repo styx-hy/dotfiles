@@ -60,8 +60,8 @@ set -g status-bg default
 set -g status-left "#[fg=red][ #[fg=green]#h #[fg=red]]#[default]"
 set -g status-left-length 20
 set -g status-right-length 25
-set -g status-right "#[fg=red][ #[fg=green]%H:%M #[fg=magenta]%a %m-%d #[fg=red]] #[default]"
-setw -g window-status-format '#[fg=blue,bold]#I: #W#F#[default]'
+set -g status-right "#[fg=red][ #[fg=green]%H:%M #[fg=blue]%a %m-%d #[fg=red]] #[default]"
+setw -g window-status-format '#[fg=cyan,bold]#I: #W#F#[default]'
 setw -g window-status-current-format '#[fg=yellow,bold,reverse]#I: #W#F#[default] '
 
 # configure rainbarf
