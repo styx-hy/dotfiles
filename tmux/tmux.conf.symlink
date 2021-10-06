@@ -56,7 +56,7 @@ set -g terminal-overrides "*88col*:colors=88,*256col*:colors=256,xterm*:colors=2
 set -g default-terminal "screen-256color"
 # set -g default-terminal "xterm-256color"
 set -g status-justify centre
-set -g status-bg default
+set -g status-style bg=default
 set -g status-left "#[fg=red][ #[fg=green]#h #[fg=red]]#[default]"
 set -g status-left-length 20
 set -g status-right-length 25
